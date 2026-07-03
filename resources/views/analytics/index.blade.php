@@ -12,53 +12,105 @@
 </div>
 
 {{-- KPI Cards --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    {{-- Net Income --}}
-    <div class="pcard relative overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white/60 dark:bg-bg-darkCard/60 backdrop-blur-lg border border-white/20">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl group-hover:bg-emerald-500/30 transition-all duration-500"></div>
-        <div class="mb-2">
-            <p class="text-sm text-text-muted dark:text-text-darkMuted font-medium">Net Income (Bulan Ini)</p>
-            <h3 class="text-2xl font-bold text-text-main dark:text-text-darkMain mt-1">
-                Rp {{ number_format($netIncomeThisMonth, 0, ',', '.') }}
-            </h3>
-        </div>
-        <div class="flex items-center text-sm {{ $netIncomeThisMonth >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
-            <i class="fas {{ $netIncomeThisMonth >= 0 ? 'fa-arrow-up' : 'fa-arrow-down' }} mr-1.5"></i>
-            <span>Pemasukan vs Pengeluaran</span>
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
+
+    {{-- Saldo Awal --}}
+    <div class="pcard">
+        <p class="text-sm text-text-muted">💰 Saldo Awal Bulan</p>
+
+        <h2 class="text-2xl font-bold mt-2">
+            Rp {{ number_format($openingBalance,0,',','.') }}
+        </h2>
+
+        <p class="text-xs mt-3 text-gray-500">
+            Sisa uang dari bulan sebelumnya
+        </p>
     </div>
 
-    {{-- Task Completion Rate --}}
-    <div class="pcard relative overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white/60 dark:bg-bg-darkCard/60 backdrop-blur-lg border border-white/20">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl group-hover:bg-primary/30 transition-all duration-500"></div>
-        <div class="mb-2">
-            <p class="text-sm text-text-muted dark:text-text-darkMuted font-medium">Tingkat Penyelesaian (Bulan Ini)</p>
-            <div class="flex items-end mt-1 gap-2">
-                <h3 class="text-2xl font-bold text-text-main dark:text-text-darkMain">
-                    {{ $taskCompletionRate }}%
-                </h3>
-                <span class="text-sm text-text-muted dark:text-text-darkMuted mb-1">({{ $tasksDoneThisMonth }} diselesaikan)</span>
+    {{-- Pemasukan --}}
+    <div class="pcard">
+        <p class="text-sm text-text-muted">
+            📈 Pemasukan Bulan Ini
+        </p>
+
+        <h2 class="text-2xl font-bold mt-2 text-emerald-500">
+            Rp {{ number_format($totalIncomeThisMonth,0,',','.') }}
+        </h2>
+
+        <p class="text-xs mt-3 text-gray-500">
+            Total uang yang diterima
+        </p>
+    </div>
+
+    {{-- Pengeluaran --}}
+    <div class="pcard">
+
+        <p class="text-sm text-text-muted">
+            📉 Pengeluaran Bulan Ini
+        </p>
+
+        <h2 class="text-2xl font-bold mt-2 text-red-500">
+            Rp {{ number_format($totalExpenseThisMonth,0,',','.') }}
+        </h2>
+
+        <p class="text-xs mt-3 text-gray-500">
+            Total uang yang digunakan
+        </p>
+
+    </div>
+
+    {{-- Saldo Saat Ini --}}
+    <div class="pcard">
+
+        <p class="text-sm text-text-muted">
+            💵 Saldo Saat Ini
+        </p>
+
+        <h2 class="text-2xl font-bold mt-2 text-primary">
+
+            Rp {{ number_format($currentBalance,0,',','.') }}
+
+        </h2>
+
+        <p class="text-xs mt-3 text-gray-500">
+
+            Saldo yang masih tersedia
+
+        </p>
+
+    </div>
+
+    {{-- Progress Task --}}
+    <div class="pcard">
+
+        <p class="text-sm text-text-muted">
+
+            ✅ Progress Task
+
+        </p>
+
+        <h2 class="text-2xl font-bold mt-2">
+
+            {{ $taskCompletionRate }}%
+
+        </h2>
+
+        <div class="w-full h-2 bg-gray-200 rounded-full mt-4">
+
+            <div class="bg-primary h-2 rounded-full"
+                style="width: {{ $taskCompletionRate }}%">
             </div>
+
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700/50 mt-3 overflow-hidden">
-            <div class="bg-gradient-to-r from-primary to-indigo-500 h-2.5 rounded-full transition-all duration-1000 ease-out" style="width: {{ $taskCompletionRate }}%"></div>
-        </div>
+
+        <p class="text-xs mt-2 text-gray-500">
+
+            {{ $tasksDoneThisMonth }} tugas selesai bulan ini
+
+        </p>
+
     </div>
 
-    {{-- Top Expense --}}
-    <div class="pcard relative overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white/60 dark:bg-bg-darkCard/60 backdrop-blur-lg border border-white/20">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-500/20 rounded-full blur-2xl group-hover:bg-red-500/30 transition-all duration-500"></div>
-        <div class="mb-2">
-            <p class="text-sm text-text-muted dark:text-text-darkMuted font-medium">Pengeluaran Terbesar</p>
-            <h3 class="text-2xl font-bold text-text-main dark:text-text-darkMain mt-1 truncate">
-                {{ $topExpenseCategory }}
-            </h3>
-        </div>
-        <div class="flex items-center text-sm text-red-500">
-            <i class="fas fa-fire mr-1.5"></i>
-            <span>Kategori dominan bulan ini</span>
-        </div>
-    </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -83,7 +135,7 @@
     </div>
 
     {{-- Expense by Category (Doughnut) --}}
-    <div class="pcard flex flex-col animate-stagger-card opacity-0 h-[420px] bg-gradient-to-br from-white to-gray-50/50 dark:from-bg-darkCard dark:to-[#222224] shadow-sm hover:shadow-md transition-shadow border-t border-t-white/40 dark:border-t-white/5">
+    <div class="pcard flex flex-col animate-stagger-card opacity-0 min-h-[620px] bg-gradient-to-br from-white to-gray-50/50 dark:from-bg-darkCard dark:to-[#222224] shadow-sm hover:shadow-md transition-shadow border-t border-t-white/40 dark:border-t-white/5">
         <div class="mb-4 text-center">
             <h2 class="text-lg font-semibold text-text-main dark:text-text-darkMain">Distribusi Pengeluaran</h2>
             <p class="text-sm text-text-muted dark:text-text-darkMuted">Komposisi Bulan Ini</p>
@@ -104,11 +156,181 @@
     </div>
 
 </div>
+{{-- Laporan Saldo 6 Bulan --}}
+<div class="pcard mt-8">
 
+    <div class="mb-5">
+
+        <h2 class="text-xl font-semibold text-text-main dark:text-text-darkMain">
+            💰 Laporan Saldo 6 Bulan
+        </h2>
+
+        <p class="text-sm text-text-muted mt-1">
+            Saldo akhir bulan sebelumnya otomatis menjadi saldo awal bulan berikutnya.
+        </p>
+
+    </div>
+
+    <div class="overflow-x-auto">
+
+        <table class="w-full">
+
+            <thead>
+
+                <tr class="border-b">
+
+                    <th class="text-left py-3">Bulan</th>
+
+                    <th class="text-right py-3">Saldo Awal</th>
+
+                    <th class="text-right py-3 text-emerald-500">
+                        Pemasukan
+                    </th>
+
+                    <th class="text-right py-3 text-red-500">
+                        Pengeluaran
+                    </th>
+
+                    <th class="text-right py-3 text-primary">
+                        Saldo Akhir
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach($monthlyReport as $report)
+
+                <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-800/30 transition">
+
+                    <td class="py-4 font-medium">
+
+                        {{ $report['month'] }}
+
+                    </td>
+
+                    <td class="text-right">
+
+                        Rp {{ number_format($report['opening'],0,',','.') }}
+
+                    </td>
+
+                    <td class="text-right text-emerald-500">
+
+                        Rp {{ number_format($report['income'],0,',','.') }}
+
+                    </td>
+
+                    <td class="text-right text-red-500">
+
+                        Rp {{ number_format($report['expense'],0,',','.') }}
+
+                    </td>
+
+                    <td class="text-right font-bold text-primary">
+
+                        Rp {{ number_format($report['closing'],0,',','.') }}
+
+                    </td>
+
+                </tr>
+
+                @endforeach
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+@if(count($categoryData['data']) > 0)
+
+<div class="mt-6 border-t pt-4">
+
+    @php
+        $totalExpense = array_sum($categoryData['data']);
+        $colors = [
+            '#3B82F6',
+            '#10B981',
+            '#F59E0B',
+            '#EF4444',
+            '#8B5CF6',
+            '#EC4899',
+            '#06B6D4',
+            '#84CC16',
+            '#F97316',
+            '#14B8A6',
+            '#6366F1',
+            '#A855F7',
+            '#22C55E',
+            '#EAB308',
+            '#DC2626'
+        ];
+    @endphp
+
+    <h3 class="font-semibold mb-3">
+        Rincian Pengeluaran
+    </h3>
+
+    @foreach($categoryData['labels'] as $i => $label)
+
+        @php
+
+            $value = $categoryData['data'][$i];
+
+            $percent = $totalExpense > 0
+                ? round(($value / $totalExpense) * 100,1)
+                : 0;
+
+        @endphp
+
+        <div class="flex items-center justify-between py-2">
+
+            <div class="flex items-center gap-3">
+
+                    <<span class="w-4 h-4 rounded-full"
+        style="background: {{ $colors[$i % count($colors)] }};">
+    </span>
+
+                <span>
+
+                    {{ $label }}
+
+                </span>
+
+            </div>
+
+            <div class="text-right">
+
+                <div class="font-semibold">
+
+                    Rp {{ number_format($value,0,',','.') }}
+
+                </div>
+
+                <div class="text-xs text-gray-500">
+
+                    {{ $percent }} %
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
+
+</div>
+
+@endif
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const isDark = document.documentElement.classList.contains('dark');
@@ -238,12 +460,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                       (net < 0) ? 'Pengeluaran melebihi pemasukan bulan ini. ⚠️' : 
                                       'Kinerja yang stabil. Tetap semangat! 💪';
 
-                        alert(`📊 INSIGHT ANALYTICS - ${month}\n\n` +
-                              `📈 Pemasukan: ${formatter.format(inc)}\n` +
-                              `📉 Pengeluaran: ${formatter.format(exp)}\n` +
-                              `💰 Net Profit: ${formatter.format(net)}\n` +
-                              `✅ Tasks Selesai: ${tsks} tasks\n\n` +
-                              `Kesimpulan: ${insight}`);
+                        aalert(`📊 LAPORAN BULAN ${month}
+
+                    💰 Saldo Akhir : ${formatter.format(inc)}
+
+                    📉 Pengeluaran : ${formatter.format(exp)}
+
+                    ✅ Task Selesai : ${tsks}
+
+                    Saldo bulan ini otomatis menjadi saldo awal bulan berikutnya.`);
                     }
                 },
                 scales: {
@@ -294,75 +519,138 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. Category Chart (Doughnut) with custom tooltip and hover effects
     const ctxCategory = document.getElementById('categoryChart');
     if (ctxCategory && categoryData.data.length > 0) {
-        new Chart(ctxCategory, {
-            type: 'doughnut',
-            data: {
-                labels: categoryData.labels,
-                datasets: [{
-                    data: categoryData.data,
-                    backgroundColor: [
-                        '#3b82f6', // blue
-                        '#10b981', // emerald
-                        '#f59e0b', // amber
-                        '#ef4444', // red
-                        '#8b5cf6', // violet
-                        '#ec4899', // pink
-                        '#06b6d4', // cyan
-                        '#64748b'  // slate
-                    ],
-                    borderWidth: 3,
-                    borderColor: isDark ? '#1e1e20' : '#ffffff', // matches card background
-                    hoverOffset: 12, // pop-out effect on hover
-                    hoverBorderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                layout: {
-                    padding: 15
+                    new Chart(ctxCategory, {
+                plugins: [ChartDataLabels],
+
+                type: 'doughnut',
+
+                data: {
+                    labels: categoryData.labels,
+                    datasets: [{
+                        data: categoryData.data,
+
+                        backgroundColor: categoryData.labels.map((_, index) => {
+
+                            const colors = [
+                                '#3B82F6',
+                                '#10B981',
+                                '#F59E0B',
+                                '#EF4444',
+                                '#8B5CF6',
+                                '#EC4899',
+                                '#06B6D4',
+                                '#84CC16',
+                                '#F97316',
+                                '#14B8A6',
+                                '#6366F1',
+                                '#A855F7',
+                                '#22C55E',
+                                '#EAB308',
+                                '#DC2626'
+                            ];
+
+                            return colors[index % colors.length];
+
+                        }),
+
+                        borderWidth: 3,
+                        borderColor: isDark ? '#1e1e20' : '#ffffff',
+
+                        hoverOffset: 22,
+                        hoverBorderWidth: 4,
+                        hoverBorderColor: '#ffffff'
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            padding: 16,
-                            font: { family: "'Inter', sans-serif", size: 12 }
-                        }
+
+                options: {
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+
+                    layout: {
+                        padding: 15
                     },
-                    tooltip: {
-                        backgroundColor: tooltipBg,
-                        titleColor: tooltipText,
-                        bodyColor: tooltipText,
-                        titleFont: { size: 13, family: "'Inter', sans-serif" },
-                        bodyFont: { size: 13, weight: 'bold', family: "'Inter', sans-serif" },
-                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        borderWidth: 1,
-                        padding: 12,
-                        cornerRadius: 8,
-                        callbacks: {
-                            label: function(context) {
-                                let label = ' ';
-                                if (context.parsed !== null) {
-                                    label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.parsed);
-                                }
-                                
-                                // Calculate percentage
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((context.parsed / total) * 100);
-                                label += ` (${percentage}%)`;
-                                
-                                return label;
+
+                    plugins: {
+
+                        datalabels: {
+
+                            color: '#ffffff',
+
+                            font: {
+                                weight: 'bold',
+                                size: 13
+                            },
+
+                            formatter: function(value, context) {
+
+                                const total = context.chart.data.datasets[0].data
+                                    .reduce((a, b) => Number(a) + Number(b), 0);
+
+                                if (total <= 0) return '';
+
+                                return ((value / total) * 100).toFixed(1) + '%';
                             }
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
+
+                        },
+
+                        legend: {
+
+                            position: 'right',
+
+                            labels: {
+                                color: textColor,
+                                usePointStyle: true,
+                                padding: 20
+                            }
+
+                        },
+
+                        tooltip: {
+
+                            backgroundColor: tooltipBg,
+                            titleColor: tooltipText,
+                            bodyColor: tooltipText,
+
+                            borderColor: isDark
+                                ? 'rgba(255,255,255,.1)'
+                                : 'rgba(0,0,0,.05)',
+
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 8,
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    const value = context.parsed;
+
+                                    const total = context.dataset.data
+                                        .reduce((a, b) => Number(a) + Number(b), 0);
+
+                                    const percentage = total > 0
+                                        ? ((value / total) * 100).toFixed(1)
+                                        : 0;
+
+                                 return [
+                                context.label,
+                                new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    maximumFractionDigits: 0
+                                }).format(value),
+                                percentage + '%'
+];
+                        } // label
+                    } // callbacks
+                } // tooltip
+            } // plugins
+        } // options
+    }); // new Chart
+} // if (ctxCategory)
+
+}); // DOMContentLoaded
 </script>
 @endpush

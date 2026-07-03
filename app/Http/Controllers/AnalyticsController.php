@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\FinanceRecord;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AnalyticsController extends Controller
@@ -12,30 +11,55 @@ class AnalyticsController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $now    = now();
+        $now = now();
 
-        // Build 6-month trend data
-        $months     = [];
-        $incomes    = [];
-        $expenses   = [];
-        $tasksDone  = [];
+        /*
+        |--------------------------------------------------------------------------
+        | Grafik Keuangan 6 Bulan
+        |--------------------------------------------------------------------------
+        */
+
+        $months = [];
+        $balances = [];
+        $expenses = [];
+        $tasksDone = [];
+
+        $runningBalance = 0;
+        $monthlyReport = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            $date  = $now->copy()->subMonths($i);
-            $label = $date->format('M Y');
 
-            $months[]   = $label;
-            $incomes[]  = (float) FinanceRecord::forUser($userId)
+            $date = $now->copy()->subMonths($i);
+
+            $income = (float) FinanceRecord::forUser($userId)
                 ->income()
                 ->whereYear('date', $date->year)
                 ->whereMonth('date', $date->month)
                 ->sum('amount');
 
-            $expenses[] = (float) FinanceRecord::forUser($userId)
+            $expense = (float) FinanceRecord::forUser($userId)
                 ->expense()
                 ->whereYear('date', $date->year)
                 ->whereMonth('date', $date->month)
                 ->sum('amount');
+
+            $opening = $runningBalance;
+
+            $runningBalance += ($income - $expense);
+
+            $closing = $runningBalance;
+
+            $months[] = $date->format('M Y');
+            $balances[] = $closing;
+            $expenses[] = $expense;
+
+            $monthlyReport[] = [
+                'month'     => $date->format('F Y'),
+                'opening'   => $opening,
+                'income'    => $income,
+                'expense'   => $expense,
+                'closing'   => $closing,
+            ];
 
             $tasksDone[] = Task::forUser($userId)
                 ->where('status', 'done')
@@ -46,7 +70,7 @@ class AnalyticsController extends Controller
 
         $financeData = [
             'labels' => $months,
-            'income' => $incomes,
+            'income' => $balances, // grafik saldo
             'expense' => $expenses,
         ];
 
@@ -55,29 +79,62 @@ class AnalyticsController extends Controller
             'completed' => $tasksDone,
         ];
 
-        // Expense by category (this month)
+        /*
+        |--------------------------------------------------------------------------
+        | Diagram Pengeluaran Bulan Ini
+        |--------------------------------------------------------------------------
+        */
+
         $expenseByCategory = FinanceRecord::forUser($userId)
             ->expense()
             ->thisMonth()
-            ->with('category')
             ->get()
-            ->groupBy(fn($r) => $r->category?->name ?? 'Lainnya')
-            ->map(fn($g) => $g->sum('amount'))
+            ->groupBy(function ($item) {
+                return $item->description ?: 'Tanpa Deskripsi';
+            })
+            ->map(function ($items) {
+                return $items->sum('amount');
+            })
             ->sortDesc();
 
         $categoryData = [
-            'labels' => $expenseByCategory->keys()->toArray(),
+            'labels' => $expenseByCategory->keys()->values()->toArray(),
             'data' => $expenseByCategory->values()->toArray(),
         ];
 
-        // Task status distribution (Overall)
+        /*
+        |--------------------------------------------------------------------------
+        | Status Task
+        |--------------------------------------------------------------------------
+        */
+
         $taskStatus = [
-            'todo'        => Task::forUser($userId)->where('status', 'todo')->count(),
+            'todo' => Task::forUser($userId)->where('status', 'todo')->count(),
             'in_progress' => Task::forUser($userId)->where('status', 'in_progress')->count(),
-            'done'        => Task::forUser($userId)->where('status', 'done')->count(),
+            'done' => Task::forUser($userId)->where('status', 'done')->count(),
         ];
 
-        // --- KPIs for this month ---
+        /*
+        |--------------------------------------------------------------------------
+        | Ringkasan Keuangan Bulan Ini
+        |--------------------------------------------------------------------------
+        */
+
+        $openingBalance = (float) FinanceRecord::forUser($userId)
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN type='income' THEN amount
+                        WHEN type='expense' THEN -amount
+                        ELSE 0
+                    END
+                ) as balance
+            ")
+            ->whereDate('date', '<', $now->copy()->startOfMonth())
+            ->value('balance');
+
+        $openingBalance = $openingBalance ?? 0;
+
         $totalIncomeThisMonth = (float) FinanceRecord::forUser($userId)
             ->income()
             ->thisMonth()
@@ -88,7 +145,16 @@ class AnalyticsController extends Controller
             ->thisMonth()
             ->sum('amount');
 
-        $netIncomeThisMonth = $totalIncomeThisMonth - $totalExpenseThisMonth;
+        $currentBalance = $openingBalance + $totalIncomeThisMonth - $totalExpenseThisMonth;
+
+        // Tetap dipakai agar Blade lama tidak error
+        $netIncomeThisMonth = $currentBalance;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistik Task
+        |--------------------------------------------------------------------------
+        */
 
         $tasksDoneThisMonth = Task::forUser($userId)
             ->where('status', 'done')
@@ -101,16 +167,30 @@ class AnalyticsController extends Controller
             ->whereMonth('created_at', $now->month)
             ->count();
 
-        $taskCompletionRate = $tasksCreatedThisMonth > 0 
-            ? round(($tasksDoneThisMonth / $tasksCreatedThisMonth) * 100, 1) 
+        $taskCompletionRate = $tasksCreatedThisMonth > 0
+            ? round(($tasksDoneThisMonth / $tasksCreatedThisMonth) * 100, 1)
             : 0;
 
         $topExpenseCategory = $expenseByCategory->keys()->first() ?? 'Tidak ada';
 
         return view('analytics.index', compact(
-            'financeData', 'taskData', 'categoryData', 'taskStatus',
-            'totalIncomeThisMonth', 'totalExpenseThisMonth', 'netIncomeThisMonth',
-            'tasksDoneThisMonth', 'taskCompletionRate', 'topExpenseCategory'
+            'financeData',
+            'taskData',
+            'categoryData',
+            'taskStatus',
+
+            'openingBalance',
+            'totalIncomeThisMonth',
+            'totalExpenseThisMonth',
+            'currentBalance',
+
+            'monthlyReport',
+
+            'netIncomeThisMonth',
+
+            'tasksDoneThisMonth',
+            'taskCompletionRate',
+            'topExpenseCategory'
         ));
     }
 }
