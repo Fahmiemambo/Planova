@@ -1,97 +1,130 @@
 <!DOCTYPE html>
-<html lang="id" class="transition-colors duration-200">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar — Planova</title>
+    <title>Daftar Gratis — Planova</title>
     <meta name="description" content="Buat akun Planova dan mulai kelola produktivitas Anda">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/css/landing.css', 'resources/js/app.js'])
 </head>
-<body class="bg-surface-100 dark:bg-dark-bg text-text-main dark:text-text-darkMain antialiased flex items-center justify-center min-h-screen p-6 transition-colors">
+<body class="font-sans antialiased min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+    style="background-color:#F0FDFA; background-image: radial-gradient(circle at 20% 40%, rgba(45,212,191,0.18) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(249,115,22,0.10) 0%, transparent 45%); background-attachment: fixed;">
 
-    <div class="w-full max-w-md bg-surface-200 dark:bg-dark-surface border border-surface-500 dark:border-dark-border rounded-2xl shadow-lg dark:shadow-dark-lg p-8 sm:p-10 animate-fade-in-up">
+    {{-- Decorative blobs --}}
+    <div class="absolute top-16 right-16 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-16 left-16 w-56 h-56 bg-secondary-light/40 rounded-full blur-3xl pointer-events-none"></div>
 
-        {{-- Logo --}}
-        <div class="flex items-center gap-3 mb-8">
-            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm">P</div>
-            <span class="font-bold text-2xl tracking-tight text-text-main dark:text-text-darkMain">Planova</span>
+    {{-- Back link --}}
+    <a href="{{ url('/') }}" class="absolute top-5 left-5 flex items-center gap-2 text-sm font-bold text-text-muted hover:text-primary transition-colors z-10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Kembali
+    </a>
+
+    <div class="w-full max-w-md relative z-10">
+        {{-- Card --}}
+        <div class="clay-card p-8 sm:p-10 animate-fade-in-up">
+
+            {{-- Logo --}}
+            <a href="{{ url('/') }}" class="flex items-center gap-3 mb-8 w-fit">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-clay-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight text-primary-dark">Plano<span class="text-primary">va</span></span>
+            </a>
+
+            <h1 class="text-2xl font-extrabold mb-1 text-primary-dark">Buat Akun Gratis</h1>
+            <p class="text-sm font-bold text-text-muted mb-7">Mulai perjalanan produktivitas Anda bersama Planova.</p>
+
+            {{-- Errors --}}
+            @if($errors->any())
+                <div class="flex items-start gap-3 p-4 mb-5 rounded-2xl border border-red-200 bg-red-50 text-red-600">
+                    <i class="bi bi-exclamation-circle-fill flex-shrink-0 mt-0.5"></i>
+                    <div class="text-sm font-bold space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}" id="register-form" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label for="name" class="form-label-p">Nama Lengkap</label>
+                    <input type="text" id="name" name="name"
+                        class="form-control-p" value="{{ old('name') }}"
+                        placeholder="Masukkan nama Anda" required autofocus>
+                </div>
+
+                <div>
+                    <label for="email" class="form-label-p">Email</label>
+                    <input type="email" id="email" name="email"
+                        class="form-control-p" value="{{ old('email') }}"
+                        placeholder="nama@email.com" required>
+                </div>
+
+                <div>
+                    <label for="password" class="form-label-p">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password"
+                            class="form-control-p pr-11" placeholder="Minimal 8 karakter" required>
+                        <button type="button" id="toggle-password"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors p-1 focus:outline-none"
+                            aria-label="Tampilkan password">
+                            <i class="bi bi-eye text-lg" id="toggle-pw-icon"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs font-bold text-text-muted mt-1">Minimal 8 karakter.</p>
+                </div>
+
+                <div>
+                    <label for="password_confirmation" class="form-label-p">Konfirmasi Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation"
+                        class="form-control-p" placeholder="Ulangi password Anda" required>
+                </div>
+
+                <button type="submit" class="btn-planova btn-primary-p w-full justify-center py-3 text-base mt-1">
+                    <i class="bi bi-person-plus"></i> Buat Akun
+                </button>
+            </form>
+
+            <p class="text-center mt-7 text-sm font-bold text-text-muted">
+                Sudah punya akun?
+                <a href="{{ route('login') }}" class="text-primary hover:text-primary-dark font-extrabold transition-colors ml-1">
+                    Masuk di sini
+                </a>
+            </p>
         </div>
 
-        <h1 class="text-2xl font-bold mb-2 text-text-main dark:text-text-darkMain">Buat Akun</h1>
-        <p class="text-sm text-text-muted dark:text-text-darkMuted mb-8">Mulai perjalanan produktivitas Anda bersama Planova.</p>
-
-        {{-- Flash errors --}}
-        @if($errors->any())
-            <div class="bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-4 rounded-lg mb-6 flex items-start gap-3">
-                <i class="bi bi-exclamation-circle-fill mt-0.5"></i>
-                <div class="text-sm font-medium">
-                    @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        {{-- Form --}}
-        <form method="POST" action="{{ route('register') }}" id="register-form" class="space-y-4">
-            @csrf
-
-            <div>
-                <label for="name" class="form-label-p">Nama Lengkap</label>
-                <input type="text" id="name" name="name" class="form-control-p" value="{{ old('name') }}" placeholder="Masukkan nama Anda" required autofocus>
-            </div>
-
-            <div>
-                <label for="email" class="form-label-p">Email</label>
-                <input type="email" id="email" name="email" class="form-control-p" value="{{ old('email') }}" placeholder="Masukkan email Anda" required>
-            </div>
-
-            <div>
-                <label for="password" class="form-label-p">Password</label>
-                <div class="relative">
-                    <input type="password" id="password" name="password" class="form-control-p pr-10" placeholder="Minimal 8 karakter" required>
-                    <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-text-darkMuted hover:text-text-main dark:hover:text-text-darkMain focus:outline-none p-1 transition-colors" aria-label="Toggle password visibility">
-                        <i class="bi bi-eye text-lg block" id="toggle-pw-icon"></i>
-                    </button>
-                </div>
-                <div class="text-xs text-text-muted dark:text-text-darkMuted mt-1">Password minimal 8 karakter.</div>
-            </div>
-
-            <div>
-                <label for="password_confirmation" class="form-label-p">Konfirmasi Password</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control-p" placeholder="Ulangi password Anda" required>
-            </div>
-
-            <button type="submit" class="btn-planova btn-primary-p w-full justify-center py-2.5 text-base mt-4">
-                <i class="bi bi-person-plus"></i>
-                Buat Akun
-            </button>
-        </form>
-
-        <p class="text-center mt-8 text-sm text-text-muted dark:text-text-darkMuted">
-            Sudah punya akun?
-            <a href="{{ route('login') }}" class="text-primary hover:text-primary-hover font-medium transition-colors">Masuk di sini</a>
-        </p>
-
+        {{-- Trust badges --}}
+        <div class="mt-5 flex flex-wrap justify-center gap-4 text-xs font-bold text-text-muted">
+            <span class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Gratis selamanya
+            </span>
+            <span class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Tanpa kartu kredit
+            </span>
+            <span class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Data aman & privat
+            </span>
+        </div>
     </div>
 
 <script>
     document.getElementById('toggle-password')?.addEventListener('click', function () {
-        const pwInput = document.getElementById('password');
-        const icon    = document.getElementById('toggle-pw-icon');
-        if (pwInput.type === 'password') {
-            pwInput.type = 'text';
-            icon.classList.replace('bi-eye', 'bi-eye-slash');
-        } else {
-            pwInput.type = 'password';
-            icon.classList.replace('bi-eye-slash', 'bi-eye');
-        }
+        const pw = document.getElementById('password');
+        const icon = document.getElementById('toggle-pw-icon');
+        pw.type = pw.type === 'password' ? 'text' : 'password';
+        icon.classList.toggle('bi-eye');
+        icon.classList.toggle('bi-eye-slash');
     });
 </script>
 </body>

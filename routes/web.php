@@ -11,6 +11,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BlockController;
+use App\Http\Controllers\SocialAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])
     ->name('register');
 
+    Route::get('/auth/{provider}', [SocialAuthController::class, 'redirect'])->name('social.redirect');
+    Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
+
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
@@ -40,11 +44,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 */
 
 Route::get('/', function () {
-
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : redirect()->route('login');
-
+    return view('landing');
 });
 
 /*

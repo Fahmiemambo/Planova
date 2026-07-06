@@ -3,31 +3,30 @@
     'max'      => 100,
     'label'    => '',
     'showText' => true,
-    'height'   => 'h-1.5',
 ])
 
 @php
     $pct = $max > 0 ? min(100, round(($value / $max) * 100)) : 0;
     
     // Determine bar color based on percentage
-    $barColorClass = 'bg-primary';
-    $textColorClass = 'text-text-main dark:text-text-darkMain';
+    $barColorClass = 'clay-progress-fill';
+    $textColorClass = 'text-primary-dark';
     
     if ($pct >= 100) {
-        $barColorClass = 'bg-red-500';
+        $barColorClass = 'bg-red-500 shadow-[0_2px_4px_rgba(239,68,68,0.3)]';
         $textColorClass = 'text-red-500';
     } elseif ($pct >= 80) {
-        $barColorClass = 'bg-amber-500';
+        $barColorClass = 'bg-amber-400 shadow-[0_2px_4px_rgba(251,191,36,0.3)]';
         $textColorClass = 'text-amber-500';
     }
 @endphp
 
 <div>
     @if($label || $showText)
-    <div class="flex justify-between items-center mb-1">
-        <span class="text-xs text-text-secondary dark:text-text-darkSecondary">{{ $label }}</span>
+    <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-bold text-primary/60 uppercase tracking-wider">{{ $label }}</span>
         @if($showText)
-            <span class="text-xs font-semibold {{ $textColorClass }}">
+            <span class="text-sm font-bold {{ $textColorClass }}">
                 {{ $pct }}%
             </span>
         @endif
@@ -35,9 +34,9 @@
     @endif
     
     {{-- Background track --}}
-    <div class="w-full bg-surface-300 dark:bg-dark-surface3 rounded-full overflow-hidden {{ $height }}">
+    <div class="clay-progress-track">
         {{-- Animated progress bar --}}
-        <div class="h-full rounded-full transition-all duration-1000 ease-out {{ $barColorClass }}"
+        <div class="{{ $barColorClass }} rounded-full transition-all duration-1000 ease-out h-full"
              style="width: 0%;"
              data-target-width="{{ $pct }}%"
              role="progressbar"
@@ -48,9 +47,7 @@
     </div>
 </div>
 
-{{-- Note: the width animation will be handled by anime.js on mount, or we can just use CSS transition --}}
 <script>
-    // Simple inline script to animate width on load using CSS transitions
     setTimeout(() => {
         document.querySelectorAll('[data-target-width]').forEach(el => {
             el.style.width = el.getAttribute('data-target-width');
