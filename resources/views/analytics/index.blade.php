@@ -291,15 +291,10 @@
 
             <div class="flex items-center gap-3">
 
-                    <<span class="w-4 h-4 rounded-full"
-        style="background: {{ $colors[$i % count($colors)] }};">
-    </span>
+                <span class="w-4 h-4 rounded-full inline-block flex-shrink-0"
+                    style="background: {{ $colors[$i % count($colors)] }};"></span>
 
-                <span>
-
-                    {{ $label }}
-
-                </span>
+                <span>{{ $label }}</span>
 
             </div>
 
@@ -460,15 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                       (net < 0) ? 'Pengeluaran melebihi pemasukan bulan ini. ⚠️' : 
                                       'Kinerja yang stabil. Tetap semangat! 💪';
 
-                        aalert(`📊 LAPORAN BULAN ${month}
-
-                    💰 Saldo Akhir : ${formatter.format(inc)}
-
-                    📉 Pengeluaran : ${formatter.format(exp)}
-
-                    ✅ Task Selesai : ${tsks}
-
-                    Saldo bulan ini otomatis menjadi saldo awal bulan berikutnya.`);
+                        alert(`📊 LAPORAN BULAN ${month}\n\n💰 Saldo Akhir : ${formatter.format(inc)}\n📉 Pengeluaran : ${formatter.format(exp)}\n✅ Task Selesai : ${tsks}\n\nSaldo bulan ini otomatis menjadi saldo awal bulan berikutnya.`);
                     }
                 },
                 scales: {

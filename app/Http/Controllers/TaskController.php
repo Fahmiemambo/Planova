@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\TaskProperty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -55,7 +56,17 @@ class TaskController extends Controller
     {
         $this->authorizeTask($task);
         $task->load('blocks');
-        return view('tasks.show', compact('task'));
+
+        // Load all property definitions for this user + the values already set on this task
+        $properties = TaskProperty::where('user_id', Auth::id())
+            ->orderBy('position')
+            ->get();
+
+        // Map property_id => value for quick lookup in the view
+        $task->load('propertyValues');
+        $valueMap = $task->propertyValues->keyBy('property_id');
+
+        return view('tasks.show', compact('task', 'properties', 'valueMap'));
     }
 
     public function edit(Task $task)
@@ -104,6 +115,22 @@ class TaskController extends Controller
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task berhasil dihapus.');
+    }
+
+    /**
+     * PATCH /tasks/{task}/status — quick status update without requiring title.
+     */
+    public function updateStatus(Request $request, Task $task)
+    {
+        $this->authorizeTask($task);
+
+        $data = $request->validate([
+            'status' => ['required', 'in:todo,in_progress,done'],
+        ]);
+
+        $task->update($data);
+
+        return response()->json(['success' => true, 'status' => $task->fresh()->status]);
     }
 
     private function authorizeTask(Task $task): void

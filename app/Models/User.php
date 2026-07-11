@@ -20,7 +20,6 @@ class User extends Authenticatable
         'provider',
         'provider_id',
         'avatar',
-        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -39,5 +38,13 @@ class User extends Authenticatable
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class);
+    }
+
+    /**
+     * Relasi Notes
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(\App\Models\Note::class);
     }
 }

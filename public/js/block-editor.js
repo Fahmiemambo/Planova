@@ -1,253 +1,308 @@
+/**
+ * block-editor.js — Quill editor with fully custom toolbar
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    const listEl = document.getElementById('block-list');
-    const addBtn = document.getElementById('block-add-btn');
-    const typeMenu = document.getElementById('block-type-menu');
-    const savingIndicator = document.getElementById('block-saving');
-    
-    if (!listEl || !window.PLANOVA?.blockRoutes) return;
 
-    let saveTimeout;
-    const blockableType = window.PLANOVA.blockable.type;
-    const blockableId = window.PLANOVA.blockable.id;
+    const routes     = window.PLANOVA?.blockRoutes;
+    const blockable  = window.PLANOVA?.blockable;
+    const initBlocks = window.PLANOVA?.initialBlocks ?? [];
+    const savingEl   = document.getElementById('block-saving');
 
-    // 1. Sortable Initialization
-    new Sortable(listEl, {
-        handle: '.block-drag-handle',
-        animation: 150,
-        ghostClass: 'bg-surface-300',
-        onEnd: function () {
-            const blockIds = Array.from(listEl.children)
-                .map(el => el.dataset.blockId)
-                .filter(id => id); // filter out placeholders if any
-            
-            if (blockIds.length === 0) return;
+    if (!routes || !blockable || !window.Quill) return;
 
-            showSaving();
-            fetch(window.PLANOVA.blockRoutes.reorder, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ block_ids: blockIds })
-            }).then(() => hideSaving());
-        }
+    // ── Register custom font / size attributors ────────────────
+
+    const FontAttributor = Quill.import('attributors/class/font');
+    FontAttributor.whitelist = [
+        'times-new-roman','arial','helvetica','georgia',
+        'courier-new','verdana','trebuchet-ms','palatino',
+        'garamond','comic-sans','impact','tahoma',
+    ];
+    Quill.register(FontAttributor, true);
+
+    const SizeStyle = Quill.import('attributors/style/size');
+    SizeStyle.whitelist = [
+        '8px','9px','10px','11px','12px','14px','16px',
+        '18px','20px','24px','28px','32px','36px','48px','72px',
+    ];
+    Quill.register(SizeStyle, true);
+
+    // ── Init Quill (no toolbar module — we drive it manually) ──
+
+    const quill = new Quill('#quill-editor', {
+        theme:   'snow',
+        modules: {
+            toolbar: false,   // disable built-in toolbar
+            history: { delay: 500, maxStack: 200 },
+        },
+        placeholder: 'Mulai menulis…',
     });
 
-    // 2. Add Block Menu Toggle
-    if (addBtn && typeMenu) {
-        addBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            typeMenu.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (e) => {
-            if (!typeMenu.contains(e.target) && !addBtn.contains(e.target)) {
-                typeMenu.classList.add('hidden');
+    // Set default font on editor container
+    quill.root.style.fontFamily = "'Times New Roman', serif";
+    quill.root.style.fontSize   = '12pt';
+
+    // ── Load existing content ─────────────────────────────────
+
+    function blocksToHtml(blocks) {
+        return blocks.map(b => {
+            const c = b.content ?? {};
+            // If block was saved as Quill HTML, return directly
+            if (c.html) return c.text ?? '';
+            switch (b.type) {
+                case 'heading': {
+                    const lvl = c.level ?? 2;
+                    return `<h${lvl}>${c.text ?? ''}</h${lvl}>`;
+                }
+                case 'todo':
+                    return `<p>${c.checked ? '☑' : '☐'} ${c.text ?? ''}</p>`;
+                case 'bullet_list':
+                    return `<ul><li>${c.text ?? ''}</li></ul>`;
+                case 'divider':
+                    return `<hr>`;
+                case 'table': {
+                    const ths = (c.headers ?? []).map(h => `<th>${h}</th>`).join('');
+                    const rows = (c.rows ?? []).map(r =>
+                        `<tr>${r.map(cell => `<td>${cell}</td>`).join('')}</tr>`
+                    ).join('');
+                    return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+                }
+                default:
+                    return `<p>${c.text ?? ''}</p>`;
             }
-        });
+        }).join('') || '';
     }
 
-    // 3. Create Block
-    document.querySelectorAll('.block-type-option').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const type = btn.dataset.type;
-            typeMenu.classList.add('hidden');
-            
-            showSaving();
-            
-            try {
-                const res = await fetch(window.PLANOVA.blockRoutes.store, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        blockable_type: blockableType,
-                        blockable_id: blockableId,
-                        type: type
-                    })
-                });
-                
-                const data = await res.json();
-                if (data.html) {
-                    const placeholder = document.getElementById('block-placeholder');
-                    if (placeholder) placeholder.remove();
-
-                    // Append HTML and animate using Anime.js if available
-                    listEl.insertAdjacentHTML('beforeend', data.html);
-                    const newBlock = listEl.lastElementChild;
-                    
-                    if (window.anime) {
-                        window.anime({
-                            targets: newBlock,
-                            opacity: [0, 1],
-                            translateY: [10, 0],
-                            duration: 400,
-                            easing: 'easeOutQuad'
-                        });
-                    }
-                    
-                    // Focus the new block
-                    const editable = newBlock.querySelector('[contenteditable="true"]');
-                    if (editable) editable.focus();
-                }
-            } catch (err) {
-                console.error("Error creating block:", err);
-            } finally {
-                hideSaving();
-            }
-        });
-    });
-
-    // 4. Update Block (Debounced ContentEditable)
-    listEl.addEventListener('input', (e) => {
-        if (e.target.hasAttribute('contenteditable')) {
-            const blockId = e.target.closest('.block-item').dataset.blockId;
-            debounceSave(blockId);
-        }
-    });
-
-    listEl.addEventListener('change', (e) => {
-        if (e.target.classList.contains('block-todo-checkbox') || e.target.classList.contains('block-heading-level-select')) {
-            const blockId = e.target.closest('.block-item').dataset.blockId;
-            saveBlockContent(blockId);
-        }
-    });
-
-    // Handle adding rows/cols to tables
-    listEl.addEventListener('click', (e) => {
-        if (e.target.closest('.table-add-row')) {
-            const blockId = e.target.closest('.table-add-row').dataset.blockId;
-            const tbody = document.querySelector(`.block-table-editor[data-block-id="${blockId}"] tbody`);
-            const colCount = tbody.closest('table').querySelector('thead tr').children.length;
-            const tr = document.createElement('tr');
-            for(let i=0; i<colCount; i++) {
-                tr.innerHTML += `<td contenteditable="true" data-block-id="${blockId}" data-is-table="1" class="border border-surface-500 dark:border-dark-border px-3 py-2 text-sm text-text-main dark:text-text-darkMain outline-none focus:bg-surface-100 dark:focus:bg-dark-bg"></td>`;
-            }
-            tbody.appendChild(tr);
-            saveBlockContent(blockId);
-        }
-        if (e.target.closest('.table-add-col')) {
-            const blockId = e.target.closest('.table-add-col').dataset.blockId;
-            const table = document.querySelector(`.block-table-editor[data-block-id="${blockId}"]`);
-            table.querySelector('thead tr').innerHTML += `<th contenteditable="true" data-block-id="${blockId}" data-is-table="1" class="border border-surface-500 dark:border-dark-border bg-surface-100 dark:bg-dark-surface2 px-3 py-2 text-sm font-semibold text-text-main dark:text-text-darkMain text-left outline-none focus:bg-surface-200 dark:focus:bg-dark-surface min-w-[100px]">New Col</th>`;
-            table.querySelectorAll('tbody tr').forEach(tr => {
-                tr.innerHTML += `<td contenteditable="true" data-block-id="${blockId}" data-is-table="1" class="border border-surface-500 dark:border-dark-border px-3 py-2 text-sm text-text-main dark:text-text-darkMain outline-none focus:bg-surface-100 dark:focus:bg-dark-bg"></td>`;
-            });
-            saveBlockContent(blockId);
-        }
-    });
-
-    // 5. Delete Block
-    listEl.addEventListener('click', async (e) => {
-        const deleteBtn = e.target.closest('.block-delete-btn');
-        if (deleteBtn) {
-            const blockId = deleteBtn.dataset.blockId;
-            const blockEl = document.getElementById(`block-${blockId}`);
-            if (!blockEl) return;
-
-            if (confirm('Hapus block ini?')) {
-                // Animate out
-                if (window.anime) {
-                    window.anime({
-                        targets: blockEl,
-                        opacity: 0,
-                        height: 0,
-                        margin: 0,
-                        padding: 0,
-                        duration: 300,
-                        easing: 'easeOutQuad',
-                        complete: () => blockEl.remove()
-                    });
-                } else {
-                    blockEl.remove();
-                }
-
-                try {
-                    await fetch(`${window.PLANOVA.blockRoutes.destroy}/${blockId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        }
-                    });
-                } catch(err) {
-                    console.error("Error deleting block", err);
-                }
-            }
-        }
-    });
-
-    // Helper functions
-    function debounceSave(blockId) {
-        clearTimeout(saveTimeout);
-        showSaving(true); // show but keep pulsing or something? We just show "saving..."
-        saveTimeout = setTimeout(() => {
-            saveBlockContent(blockId);
-        }, 1000);
+    const initialHtml = blocksToHtml(initBlocks);
+    if (initialHtml) {
+        quill.clipboard.dangerouslyPasteHTML(initialHtml);
     }
 
-    async function saveBlockContent(blockId) {
-        const blockEl = document.getElementById(`block-${blockId}`);
-        if (!blockEl) return;
+    let savedBlockId = initBlocks[0]?.id ?? null;
 
-        const type = blockEl.dataset.blockType;
-        let content = {};
+    // ── Auto-save ─────────────────────────────────────────────
 
-        if (type === 'todo') {
-            content.checked = blockEl.querySelector('.block-todo-checkbox').checked;
-            content.text = blockEl.querySelector('.block-content').innerText;
-            if (content.checked) {
-                blockEl.querySelector('.block-content').classList.add('line-through', 'text-text-muted', 'dark:text-text-darkMuted');
-            } else {
-                blockEl.querySelector('.block-content').classList.remove('line-through', 'text-text-muted', 'dark:text-text-darkMuted');
-            }
-        } else if (type === 'heading') {
-            content.level = blockEl.querySelector('.block-heading-level-select').value;
-            content.text = blockEl.querySelector('.block-content').innerText;
-            // update classes dynamically for visual feedback before reload
-            const ct = blockEl.querySelector('.block-content');
-            ct.className = `block-content text-text-main dark:text-text-darkMain outline-none font-bold ${content.level == 1 ? 'text-3xl mt-6' : (content.level == 2 ? 'text-2xl mt-4' : 'text-xl mt-2')}`;
-        } else if (type === 'table') {
-            const thead = Array.from(blockEl.querySelectorAll('thead th')).map(th => th.innerText);
-            const rows = Array.from(blockEl.querySelectorAll('tbody tr')).map(tr => {
-                return Array.from(tr.querySelectorAll('td')).map(td => td.innerText);
-            });
-            content = { headers: thead, rows: rows };
-        } else if (type !== 'divider') {
-            content.text = blockEl.querySelector('.block-content').innerText;
-        }
+    let saveTimer = null;
+
+    function showSaving() {
+        if (!savingEl) return;
+        savingEl.innerHTML = '<i class="bi bi-arrow-repeat mr-1 animate-spin"></i>Menyimpan…';
+        savingEl.style.opacity = '1';
+    }
+    function hideSaving() {
+        if (!savingEl) return;
+        savingEl.innerHTML = '<i class="bi bi-cloud-check mr-1"></i>Tersimpan';
+        setTimeout(() => { savingEl.style.opacity = '0'; }, 2500);
+    }
+
+    async function persistContent() {
+        const html = quill.root.innerHTML;
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        const body = JSON.stringify({ content: { text: html, html: true } });
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrf,
+        };
 
         try {
-            await fetch(`${window.PLANOVA.blockRoutes.update}/${blockId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ content: content })
-            });
+            if (savedBlockId) {
+                await fetch(`${routes.update}/${savedBlockId}`, { method:'PUT', headers, body });
+            } else {
+                const res = await fetch(routes.store, {
+                    method: 'POST', headers,
+                    body: JSON.stringify({
+                        blockable_type: blockable.type,
+                        blockable_id:   blockable.id,
+                        type: 'text',
+                        content: { text: html, html: true },
+                    }),
+                });
+                const data = await res.json();
+                savedBlockId = data.block?.id ?? data.id ?? null;
+            }
+            hideSaving();
         } catch(err) {
-            console.error("Save failed", err);
-        } finally {
+            console.error('Save failed:', err);
             hideSaving();
         }
     }
 
-    function showSaving(isDebouncing = false) {
-        savingIndicator.innerHTML = isDebouncing 
-            ? '<i class="bi bi-arrow-repeat animate-spin mr-1"></i>Menyimpan…' 
-            : '<i class="bi bi-cloud-arrow-up mr-1"></i>Menyimpan…';
-        savingIndicator.style.opacity = '1';
+    quill.on('text-change', () => {
+        showSaving();
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(persistContent, 1200);
+    });
+
+    // ── Custom toolbar wiring ──────────────────────────────────
+
+    // Track last known selection — restored before every format command
+    // so toolbar clicks (which blur the editor) still apply correctly.
+    let lastRange = null;
+
+    quill.on('selection-change', (range) => {
+        if (range) {
+            lastRange = range;
+            syncActiveStates();
+        }
+    });
+
+    /** Restore focus + selection, then run a callback that calls quill.format() */
+    function withSelection(fn) {
+        // Re-focus editor
+        quill.focus();
+        // Restore saved range if editor lost focus (getSelection() returns null after blur)
+        const current = quill.getSelection();
+        if (!current && lastRange) {
+            quill.setSelection(lastRange.index, lastRange.length, 'silent');
+        }
+        fn();
     }
 
-    function hideSaving() {
-        savingIndicator.innerHTML = '<i class="bi bi-cloud-check mr-1"></i>Tersimpan';
-        setTimeout(() => {
-            savingIndicator.style.opacity = '0';
-        }, 2000);
+    // Font family select
+    const fontSel = document.getElementById('rte-font');
+    const fontMap = {
+        'times-new-roman': "'Times New Roman', serif",
+        'arial':           'Arial, sans-serif',
+        'helvetica':       'Helvetica, Arial, sans-serif',
+        'georgia':         'Georgia, serif',
+        'courier-new':     "'Courier New', monospace",
+        'verdana':         'Verdana, Geneva, sans-serif',
+        'trebuchet-ms':    "'Trebuchet MS', sans-serif",
+        'palatino':        "'Palatino Linotype', Palatino, serif",
+        'garamond':        "Garamond, serif",
+        'comic-sans':      "'Comic Sans MS', cursive",
+        'impact':          'Impact, Charcoal, sans-serif',
+        'tahoma':          'Tahoma, Geneva, sans-serif',
+    };
+    // mousedown instead of change — fires before blur
+    fontSel?.addEventListener('mousedown', () => { lastRange = quill.getSelection() ?? lastRange; });
+    fontSel?.addEventListener('change', () => {
+        withSelection(() => quill.format('font', fontSel.value || false));
+    });
+
+    // Font size select
+    const sizeSel = document.getElementById('rte-size');
+    sizeSel?.addEventListener('mousedown', () => { lastRange = quill.getSelection() ?? lastRange; });
+    sizeSel?.addEventListener('change', () => {
+        withSelection(() => quill.format('size', sizeSel.value ? `${sizeSel.value}px` : false));
+    });
+
+    // Toggle format buttons (bold, italic, underline, strike, list, align, indent, blockquote, code-block)
+    document.querySelectorAll('#rte-toolbar .rte-fmt-btn').forEach(btn => {
+        btn.addEventListener('mousedown', e => {
+            e.preventDefault(); // critical: prevents editor blur on mousedown
+            lastRange = quill.getSelection() ?? lastRange; // capture before any focus change
+
+            const fmt = btn.dataset.fmt;
+            const val = btn.dataset.val;
+            if (!fmt) return;
+
+            withSelection(() => {
+                if (fmt === 'link') {
+                    const url = prompt('URL link:', 'https://');
+                    if (url) quill.format('link', url);
+                    return;
+                }
+
+                if (['bold','italic','underline','strike','blockquote','code-block'].includes(fmt)) {
+                    const current = quill.getFormat()[fmt];
+                    quill.format(fmt, !current);
+                    btn.classList.toggle('is-active', !current);
+                    return;
+                }
+
+                if (fmt === 'script') {
+                    const current = quill.getFormat()['script'];
+                    quill.format('script', current === val ? false : val);
+                    return;
+                }
+
+                if (fmt === 'align') {
+                    quill.format('align', val || false);
+                    syncActiveStates();
+                    return;
+                }
+
+                if (fmt === 'list') {
+                    const current = quill.getFormat()['list'];
+                    quill.format('list', current === val ? false : val);
+                    syncActiveStates();
+                    return;
+                }
+
+                if (fmt === 'indent') {
+                    quill.format('indent', val);
+                    return;
+                }
+            });
+        });
+    });
+
+    // Text color
+    const colorBtn   = document.getElementById('rte-color-btn');
+    const colorInput = document.getElementById('rte-color-input');
+    const colorBar   = document.getElementById('rte-color-bar');
+    colorBtn?.addEventListener('mousedown', e => {
+        e.preventDefault();
+        lastRange = quill.getSelection() ?? lastRange;
+        colorInput.click();
+    });
+    colorInput?.addEventListener('input', () => {
+        colorBar.style.background = colorInput.value;
+        withSelection(() => quill.format('color', colorInput.value));
+    });
+
+    // Highlight / background color
+    const bgBtn   = document.getElementById('rte-bg-btn');
+    const bgInput = document.getElementById('rte-bg-input');
+    const bgBar   = document.getElementById('rte-bg-bar');
+    bgBtn?.addEventListener('mousedown', e => {
+        e.preventDefault();
+        lastRange = quill.getSelection() ?? lastRange;
+        bgInput.click();
+    });
+    bgInput?.addEventListener('input', () => {
+        bgBar.style.background = bgInput.value;
+        withSelection(() => quill.format('background', bgInput.value));
+    });
+
+    // Clear formatting
+    document.getElementById('rte-clear')?.addEventListener('mousedown', e => {
+        e.preventDefault();
+        lastRange = quill.getSelection() ?? lastRange;
+        withSelection(() => {
+            const range = quill.getSelection();
+            if (range) quill.removeFormat(range.index, range.length);
+        });
+    });
+
+    // ── Sync active states when cursor moves ──────────────────
+
+    function syncActiveStates() {
+        const fmt = quill.getFormat();
+
+        document.querySelectorAll('#rte-toolbar .rte-fmt-btn[data-fmt]').forEach(btn => {
+            const f = btn.dataset.fmt;
+            const v = btn.dataset.val;
+            let active = false;
+
+            if (['bold','italic','underline','strike','blockquote','code-block'].includes(f)) {
+                active = !!fmt[f];
+            } else if (f === 'align') {
+                active = (fmt.align ?? '') === (v ?? '');
+            } else if (f === 'list') {
+                active = fmt.list === v;
+            } else if (f === 'script') {
+                active = fmt.script === v;
+            }
+            btn.classList.toggle('is-active', active);
+        });
+
+        if (fontSel && fmt.font)  fontSel.value = fmt.font;
+        if (sizeSel && fmt.size)  sizeSel.value = fmt.size.replace('px','');
+        if (colorBar && fmt.color)       colorBar.style.background = fmt.color;
+        if (bgBar    && fmt.background)  bgBar.style.background    = fmt.background;
     }
-});
+
+}); // end DOMContentLoaded

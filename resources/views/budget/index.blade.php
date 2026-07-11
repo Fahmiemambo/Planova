@@ -18,8 +18,8 @@
     @forelse($budgets as $budget)
         <div class="pcard animate-stagger-card opacity-0">
             <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-xl bg-surface-100 dark:bg-dark-surface2 flex items-center justify-center text-2xl mb-2">
-                    {{ ['🍕', '🚗', '🛍️', '💡', '🎮', '✈️'][rand(0,5)] }}
+                <div class="w-12 h-12 rounded-xl bg-surface-100 dark:bg-dark-surface2 flex items-center justify-center mb-2">
+                    <i class="bi bi-wallet2 text-2xl text-primary"></i>
                 </div>
                 <button class="text-text-muted hover:text-text-main dark:text-text-darkMuted dark:hover:text-text-darkMain p-1">
                     <i class="bi bi-three-dots-vertical"></i>

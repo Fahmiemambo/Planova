@@ -103,9 +103,11 @@ class BlockController extends Controller
      */
     private function authorizeBlockable(string $type, int $id): void
     {
-        // Currently supports Task; extend for other models
         if ($type === 'App\\Models\\Task') {
             $model = Task::findOrFail($id);
+            abort_if($model->user_id !== Auth::id(), 403);
+        } elseif ($type === 'App\\Models\\Note') {
+            $model = \App\Models\Note::findOrFail($id);
             abort_if($model->user_id !== Auth::id(), 403);
         } else {
             abort(403, 'Unsupported blockable type.');

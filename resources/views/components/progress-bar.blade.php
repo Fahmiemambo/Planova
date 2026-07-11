@@ -47,6 +47,7 @@
     </div>
 </div>
 
+@once
 <script>
     setTimeout(() => {
         document.querySelectorAll('[data-target-width]').forEach(el => {
@@ -54,3 +55,4 @@
         });
     }, 100);
 </script>
+@endonce

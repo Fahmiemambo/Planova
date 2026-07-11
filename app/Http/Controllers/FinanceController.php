@@ -14,9 +14,13 @@ class FinanceController extends Controller
         $userId     = Auth::id();
         $type       = $request->get('type');
         $categoryId = $request->get('category_id');
-        $month      = $request->get('month', now()->format('Y-m'));
+        $month = $request->get('month', now()->format('Y-m'));
 
-        [$year, $mon] = explode('-', $month . '-' . now()->month);
+        // Ensure month is always in Y-m format before splitting
+        if (!preg_match('/^\d{4}-\d{1,2}$/', $month)) {
+            $month = now()->format('Y-m');
+        }
+        [$year, $mon] = explode('-', $month);
 
         $query = FinanceRecord::forUser($userId)
             ->with('category')
