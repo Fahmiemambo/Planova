@@ -17,7 +17,7 @@
 
 <div class="max-w-2xl">
     <div class="pcard animate-fade-in-up">
-        <form method="POST" action="{{ route('tasks.store') }}" id="create-task-form" class="space-y-6">
+        <form method="POST" action="{{ route('tasks.store') }}" id="create-task-form" class="space-y-6" data-ajax="true" data-redirect-url="{{ route('tasks.index') }}">
             @csrf
 
             <div>

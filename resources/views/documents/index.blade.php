@@ -170,14 +170,16 @@ switch ($document->extension) {
 
         <form
             action="{{ route('documents.destroy', $document) }}"
-            method="POST">
+            method="POST"
+            data-ajax="true"
+            data-confirm-message="Hapus dokumen ini?"
+            data-remove-target=".workspace-item">
 
             @csrf
             @method('DELETE')
 
             <button
                 type="submit"
-                onclick="return confirm('Hapus dokumen ini?')"
                 class="btn-delete">
 
                 <i class="bi bi-trash-fill"></i>

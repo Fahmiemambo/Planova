@@ -12,8 +12,6 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\SocialAuthController;
-use App\Http\Controllers\TaskPropertyController;
-use App\Http\Controllers\NoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,12 +62,6 @@ Route::middleware('auth')->group(function () {
     // Tasks
     Route::resource('tasks', TaskController::class);
 
-    // Notes
-    Route::resource('notes', NoteController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
-
-    // Task status quick-update (no title required)
-    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
-
     // Finance
     Route::resource('finance', FinanceController::class);
 
@@ -79,11 +71,11 @@ Route::middleware('auth')->group(function () {
     // Documents
     Route::resource('documents', DocumentController::class);
 
-    Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])
-        ->name('documents.preview');
-
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
         ->name('documents.download');
+
+    Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])
+        ->name('documents.preview');
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])
@@ -113,33 +105,6 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/reorder', [BlockController::class, 'reorder'])
             ->name('reorder');
-
-    });
-
-    // Task Properties (definitions + per-task values)
-    Route::prefix('task-properties')->name('task-properties.')->group(function () {
-
-        Route::get('/', [TaskPropertyController::class, 'index'])
-            ->name('index');
-
-        Route::post('/', [TaskPropertyController::class, 'store'])
-            ->name('store');
-
-        Route::put('/{property}', [TaskPropertyController::class, 'update'])
-            ->name('update');
-
-        Route::delete('/{property}', [TaskPropertyController::class, 'destroy'])
-            ->name('destroy');
-
-        Route::post('/reorder', [TaskPropertyController::class, 'reorder'])
-            ->name('reorder');
-
-        // Per-task values
-        Route::post('/{property}/values', [TaskPropertyController::class, 'setValue'])
-            ->name('values.set');
-
-        Route::delete('/{property}/values/{taskId}', [TaskPropertyController::class, 'clearValue'])
-            ->name('values.clear');
 
     });
 

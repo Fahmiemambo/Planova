@@ -45,7 +45,7 @@
         <a href="{{ route('tasks.edit', $task) }}" class="btn-planova btn-secondary-p">
             <i class="bi bi-pencil"></i> Edit
         </a>
-        <form method="POST" action="{{ route('tasks.destroy', $task) }}" onsubmit="return confirm('Hapus task ini?')">
+        <form method="POST" action="{{ route('tasks.destroy', $task) }}" data-ajax="true" data-confirm-message="Hapus task ini?" data-redirect-url="{{ route('tasks.index') }}">
             @csrf @method('DELETE')
             <button type="submit" class="btn-planova btn-danger-p"><i class="bi bi-trash"></i> Hapus</button>
         </form>

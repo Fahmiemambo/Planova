@@ -48,7 +48,7 @@ class TaskController extends Controller
             ]);
         }
 
-        return redirect()->route('tasks.show', $task)
+        return redirect()->route('tasks.index')
             ->with('success', 'Task berhasil dibuat!');
     }
 

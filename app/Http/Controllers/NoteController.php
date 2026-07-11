@@ -50,6 +50,13 @@ class NoteController extends Controller
         if ($note->user_id !== auth()->id()) abort(403);
         
         $note->delete();
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Catatan berhasil dihapus.'
+            ]);
+        }
         
         return redirect()->route('notes.index')->with('success', 'Catatan berhasil dihapus.');
     }

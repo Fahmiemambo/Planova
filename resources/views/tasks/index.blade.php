@@ -90,7 +90,7 @@
                                 <a href="{{ route('tasks.edit', $task) }}" class="btn-planova btn-ghost-p p-1.5" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form method="POST" action="{{ route('tasks.destroy', $task) }}" onsubmit="return confirm('Hapus task ini?')">
+                                <form method="POST" action="{{ route('tasks.destroy', $task) }}" data-ajax="true" data-confirm-message="Hapus task ini?" data-remove-target="tr">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn-planova btn-ghost-p text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5" title="Hapus">
                                         <i class="bi bi-trash"></i>

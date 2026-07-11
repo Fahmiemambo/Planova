@@ -139,62 +139,195 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 4. Global SPA Form Handler
-    document.querySelectorAll('form').forEach(form => {
-        // Abaikan form login, register, dan logout
-        if(form.id === 'login-form' || form.id === 'register-form' || form.action.includes('logout')) return;
+    window.showConfirmDialog = function(message) {
+        return new Promise(resolve => {
+            const modal = document.getElementById('confirm-modal');
+            const messageEl = document.getElementById('confirm-modal-message');
+            const confirmButton = document.getElementById('confirm-modal-confirm');
+            const cancelButton = document.getElementById('confirm-modal-cancel');
 
+            if (!modal || !messageEl || !confirmButton || !cancelButton) {
+                resolve(window.confirm(message));
+                return;
+            }
+
+            const resetModal = () => {
+                modal.classList.add('hidden');
+                confirmButton.removeEventListener('click', onConfirm);
+                cancelButton.removeEventListener('click', onCancel);
+                document.removeEventListener('keydown', onKeyDown);
+            };
+
+            const onConfirm = () => {
+                resetModal();
+                resolve(true);
+            };
+
+            const onCancel = () => {
+                resetModal();
+                resolve(false);
+            };
+
+            const onKeyDown = e => {
+                if (e.key === 'Escape') {
+                    onCancel();
+                }
+            };
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+            confirmButton.focus();
+
+            confirmButton.addEventListener('click', onConfirm);
+            cancelButton.addEventListener('click', onCancel);
+            document.addEventListener('keydown', onKeyDown);
+        });
+    };
+
+    // Show a centered alert dialog with single OK button
+    window.showAlertDialog = function(message) {
+        return new Promise(resolve => {
+            const modal = document.getElementById('confirm-modal');
+            const messageEl = document.getElementById('confirm-modal-message');
+            const confirmButton = document.getElementById('confirm-modal-confirm');
+            const cancelButton = document.getElementById('confirm-modal-cancel');
+
+            if (!modal || !messageEl || !confirmButton || !cancelButton) {
+                alert(message);
+                resolve();
+                return;
+            }
+
+            // Backup
+            const prevConfirmText = confirmButton.innerHTML;
+            const prevCancelDisplay = cancelButton.style.display;
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                confirmButton.innerHTML = prevConfirmText;
+                cancelButton.style.display = prevCancelDisplay;
+                confirmButton.removeEventListener('click', onOk);
+            };
+
+            const onOk = () => {
+                cleanup();
+                resolve();
+            };
+
+            // Configure for alert: hide cancel, set OK text
+            messageEl.textContent = message;
+            cancelButton.style.display = 'none';
+            confirmButton.innerHTML = 'OK';
+
+            modal.classList.remove('hidden');
+            confirmButton.focus();
+
+            confirmButton.addEventListener('click', onOk);
+        });
+    };
+
+    const ajaxForms = document.querySelectorAll('form[data-ajax="true"]');
+
+    const removeFormContainer = (form) => {
+        const targetSelectors = (form.dataset.removeTarget || '.workspace-item, tr, .pcard, .document-card, .note-card')
+            .split(',')
+            .map(s => s.trim());
+
+        for (const selector of targetSelectors) {
+            const container = form.closest(selector);
+            if (container) {
+                container.remove();
+                return true;
+            }
+        }
+        return false;
+    };
+
+    ajaxForms.forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            const formData = new FormData(form);
+            let method = form.method.toUpperCase();
+
+            if (formData.has('_method')) {
+                method = formData.get('_method').toUpperCase();
+            }
+
+            if (method === 'DELETE') {
+                const message = form.dataset.confirmMessage || 'Apakah Anda yakin ingin menghapus item ini?';
+                const confirmed = await window.showConfirmDialog(message);
+                if (!confirmed) return;
+            }
+
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
-            
+
             if (submitBtn) {
                 submitBtn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin"></i> Menyimpan...';
                 submitBtn.disabled = true;
             }
 
             try {
-                const formData = new FormData(form);
-                let method = form.method.toUpperCase();
-                
-                // Cek override method laravel
-                if(formData.has('_method')) {
-                    method = formData.get('_method').toUpperCase();
-                }
-
-                // Jangan ubah method di FormData, fetch akan kirim POST dengan _method=PUT (standar Laravel API)
-                // Kita selalu pakai POST di fetch untuk form laravel dengan FormData
-                const fetchMethod = 'POST'; 
-
                 const response = await fetch(form.action, {
-                    method: fetchMethod,
+                    method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
                     },
-                    body: formData
+                    body: formData,
+                    redirect: 'follow'
                 });
 
+                const contentType = response.headers.get('content-type') || '';
+                let data = null;
+
+                if (contentType.includes('application/json')) {
+                    data = await response.json();
+                }
+
                 if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Show custom Toast notification
-                    showPlanovaToast(data.message || 'Tersimpan sukses!');
-                    
-                    // Kosongkan form jika ini adalah form pembuatan (method asli form adalah POST, bukan update/PUT)
-                    if (method === 'POST') {
+                    // If a redirect target is provided for POST (create), navigate there regardless of JSON
+                    if (method !== 'DELETE' && form.dataset.redirectUrl) {
+                        window.location = form.dataset.redirectUrl;
+                        return;
+                    }
+
+                    if (data && data.success) {
+                        // If this was a delete, remove from DOM and show centered alert
+                        if (method === 'DELETE') {
+                            const removed = removeFormContainer(form);
+                            await window.showAlertDialog(data.message || 'Item berhasil dihapus.');
+                            if (!removed && form.dataset.redirectUrl) {
+                                window.location = form.dataset.redirectUrl;
+                                return;
+                            }
+                        } else {
+                            showPlanovaToast(data.message || 'Berhasil.');
+                        }
+                    } else {
+                        // No JSON response: if DELETE, still remove and show generic alert; otherwise show generic toast
+                        if (method === 'DELETE') {
+                            const removed = removeFormContainer(form);
+                            await window.showAlertDialog('Item berhasil dihapus.');
+                            if (!removed && form.dataset.redirectUrl) {
+                                window.location = form.dataset.redirectUrl;
+                                return;
+                            }
+                        } else {
+                            showPlanovaToast('Berhasil.');
+                        }
+                    }
+
+                    if (method === 'POST' && form.dataset.resetOnSuccess === 'true') {
                         form.reset();
                     }
-                    
-                    // Hilangkan pesan error validasi sebelumnya jika ada
+
                     form.querySelectorAll('.validation-error').forEach(el => el.remove());
-                } else if (response.status === 422) {
-                    const data = await response.json();
+                } else if (response.status === 422 && data) {
                     showPlanovaToast('Gagal menyimpan. Periksa input Anda.', 'error');
-                    
-                    // Tampilkan error
                     form.querySelectorAll('.validation-error').forEach(el => el.remove());
                     for (const key in data.errors) {
                         const input = form.querySelector(`[name="${key}"]`);

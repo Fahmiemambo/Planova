@@ -139,7 +139,7 @@
                                 <a href="{{ route('finance.edit', $record) }}" class="btn-planova btn-ghost-p p-1.5" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form method="POST" action="{{ route('finance.destroy', $record) }}" onsubmit="return confirm('Hapus transaksi ini?')">
+                                <form method="POST" action="{{ route('finance.destroy', $record) }}" data-ajax="true" data-confirm-message="Hapus transaksi ini?" data-remove-target="tr">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn-planova btn-ghost-p text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5" title="Hapus"><i class="bi bi-trash"></i></button>
                                 </form>

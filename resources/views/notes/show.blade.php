@@ -25,7 +25,7 @@
         <div class="flex items-center gap-4 text-xs text-text-muted dark:text-text-darkMuted">
             <span>Dibuat {{ $note->created_at->format('d M Y') }}</span>
             <span>&middot;</span>
-            <form method="POST" action="{{ route('notes.destroy', $note) }}" onsubmit="return confirm('Hapus catatan ini selamanya?')">
+            <form method="POST" action="{{ route('notes.destroy', $note) }}" data-ajax="true" data-confirm-message="Hapus catatan ini selamanya?" data-redirect-url="{{ route('notes.index') }}">
                 @csrf @method('DELETE')
                 <button type="submit" class="text-red-500 hover:text-red-600 dark:hover:text-red-400 transition-colors">Hapus Note</button>
             </form>

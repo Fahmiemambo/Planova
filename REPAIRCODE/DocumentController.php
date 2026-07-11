@@ -140,7 +140,7 @@ class DocumentController extends Controller
     /**
      * Hapus dokumen
      */
-    public function destroy(Document $document)
+    public function destroy(Request $request, Document $document)
     {
         abort_if($document->user_id != auth()->id(), 403);
 
@@ -150,10 +150,11 @@ class DocumentController extends Controller
 
         $document->delete();
 
-        if (request()->wantsJson()) {
+        // AJAX request → return JSON
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Dokumen berhasil dihapus.'
+                'message' => 'Dokumen berhasil dihapus.',
             ]);
         }
 

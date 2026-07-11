@@ -78,6 +78,16 @@
     });
 </script>
 
-@stack('scripts')
-</body>
+    <div id="confirm-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 hidden">
+        <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl dark:bg-zinc-900">
+            <h3 class="text-xl font-extrabold text-text-main dark:text-text-darkMain mb-3">Konfirmasi Hapus</h3>
+            <p id="confirm-modal-message" class="text-sm text-text-muted dark:text-text-darkMuted leading-relaxed mb-6">Apakah Anda yakin ingin melanjutkan aksi ini?</p>
+            <div class="flex flex-col sm:flex-row justify-end gap-3">
+                <button type="button" id="confirm-modal-cancel" class="btn-planova btn-secondary-p w-full sm:w-auto">Batal</button>
+                <button type="button" id="confirm-modal-confirm" class="btn-planova btn-danger-p w-full sm:w-auto">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    @stack('scripts')
 </html>
