@@ -1,6 +1,14 @@
 <header class="h-16 flex items-center px-4 lg:px-8 gap-3 flex-shrink-0 z-30"
     style="background: rgba(240,253,250,0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1.5px solid rgba(255,255,255,0.7);">
 
+    {{-- Logo --}}
+    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 flex-shrink-0 group">
+        <div class="w-9 h-9 rounded-xl overflow-hidden">
+            <img src="/images/planova-logo.png" alt="Planova" class="w-full h-full object-contain">
+        </div>
+        <span class="font-bold text-primary hidden sm:inline">Planova</span>
+    </a>
+
     {{-- Mobile Sidebar toggle --}}
     <button class="sidebar-toggle-btn lg:hidden btn-planova btn-secondary-p !px-2.5 !py-2 flex-shrink-0" aria-label="Toggle sidebar">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>

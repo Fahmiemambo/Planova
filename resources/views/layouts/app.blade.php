@@ -7,6 +7,11 @@
     <meta name="description" content="@yield('meta_description', 'Planova — Your personal productivity workspace')">
     <title>@yield('title', 'Dashboard') — Planova</title>
 
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="/images/planova-logo.png">
+    <link rel="shortcut icon" href="/images/planova-logo.png">
+    <link rel="apple-touch-icon" href="/images/planova-logo.png">
+
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

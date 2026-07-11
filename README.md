@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🪴 Planova
+# 🪴 Planova FOR THE DEVELOPER MD
 
 ### Satu workspace buat semua: tugas, catatan, keuangan, dokumen, dan analitik.
 

@@ -1,8 +1,10 @@
 <header class="relative z-20 mx-auto w-full max-w-7xl px-6 py-6 lg:px-8">
     <div class="flex items-center justify-between gap-4">
         <a href="{{ route('home') }}" class="flex items-center gap-3">
-            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-white shadow-lg shadow-primary/20">P</div>
-            <div>
+            <div class="h-12 w-12 flex-shrink-0 rounded-2xl overflow-hidden">
+                <img src="/images/planova-logo.png" alt="Planova" class="w-full h-full object-contain">
+            </div>
+            <div class="hidden sm:block">
                 <div class="text-lg font-semibold tracking-tight">Planova</div>
                 <div class="text-sm text-text-muted dark:text-text-darkMuted">Productivity OS</div>
             </div>
