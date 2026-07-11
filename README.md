@@ -1,67 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+# 🪴 Planova
+
+### Satu workspace buat semua: tugas, catatan, keuangan, dokumen, dan analitik.
+
+<p>
+  <img src="https://img.shields.io/badge/Laravel-10-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 10">
+  <img src="https://img.shields.io/badge/PHP-%5E8.1-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.1+">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/React-JSX-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React">
 </p>
 
-## About Laravel
+<p>
+  <img src="https://img.shields.io/badge/status-active--development-orange?style=flat-square" alt="Status">
+  <img src="https://img.shields.io/badge/license-unlicensed-lightgrey?style=flat-square" alt="License">
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[Fitur](#-fitur-utama) • [Tech Stack](#%EF%B8%8F-tech-stack) • [Instalasi](#-instalasi--menjalankan-lokal) • [Struktur](#-struktur-project) • [Roadmap](#-roadmap)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+</div>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📖 Tentang
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Planova** adalah workspace produktivitas terinspirasi dari Notion — dibangun dari nol pakai Laravel. Daripada bolak-balik antara app to-do list, catatan, dan aplikasi keuangan yang beda-beda, Planova menyatukan semuanya jadi satu tempat yang rapi dan enak dipakai.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Dibangun dengan gaya visual **claymorphism** — soft shadow, rounded corner, dan palet warna teal & orange yang hangat — dilengkapi micro-interaction pakai Anime.js supaya interaksinya terasa hidup, bukan sekadar CRUD app biasa.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+> 💡 Project ini juga jadi tempat eksperimen UI/UX pribadi — dari sistem grouped status property, custom task type, sampai block-based rich text editor ala Notion.
 
-## Laravel Sponsors
+<!--
+📸 Tempat buat screenshot / preview
+Ganti bagian ini dengan GIF atau gambar dashboard, board view, dan notes editor supaya orang yang buka repo langsung kebayang tampilannya.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+<div align="center">
+  <img src="docs/preview-dashboard.png" width="800" alt="Planova Dashboard">
+</div>
+-->
 
-### Premium Partners
+## ✨ Fitur Utama
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+<table>
+<tr>
+<td width="50%" valign="top">
 
-## Contributing
+### 📋 Tasks
+- Status `todo` → `in_progress` → `done` + prioritas & due date
+- **Custom Task Properties** — bikin properti sendiri (select, dsb) mirip database property Notion
+- **Board view** & **Table view** (React) — pindah tampilan sesuka hati
+- **Command menu** (⌘K) buat navigasi cepat tanpa mouse
+- Quick status update langsung dari list
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 📝 Notes
+- **Block-based editor** — text, heading, bullet list, to-do, divider, table
+- Tiap block bisa disusun ulang urutannya secara bebas
+- Struktur block-nya polymorphic, reusable ke entity lain
 
-## Code of Conduct
+</td>
+<td width="50%" valign="top">
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 💰 Finance & Budget
+- Catat pemasukan & pengeluaran per kategori
+- Set budget bulanan/tahunan + progress pemakaian otomatis
+- Ringkasan saldo bulan berjalan langsung di dashboard
 
-## Security Vulnerabilities
+### 📁 Documents
+- Upload, simpan, dan download dokumen tanpa keluar workspace
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 📊 Analytics
+- Grafik tren keuangan & task selesai 6 bulan terakhir (Chart.js)
 
-## License
+### 🔐 Auth
+- Login/register standar + **Login with Google** (Socialite)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# Planova" 
+</td>
+</tr>
+</table>
+
+## 🛠️ Tech Stack
+
+<table>
+<tr><td><b>Backend</b></td><td>Laravel 10 · PHP ^8.1</td></tr>
+<tr><td><b>Frontend</b></td><td>Blade · Tailwind CSS 3 · React (Board/Table view, Command Menu)</td></tr>
+<tr><td><b>Auth</b></td><td>Laravel Sanctum · Laravel Socialite (Google OAuth)</td></tr>
+<tr><td><b>Animasi</b></td><td>Anime.js</td></tr>
+<tr><td><b>Chart</b></td><td>Chart.js</td></tr>
+<tr><td><b>Build Tool</b></td><td>Vite</td></tr>
+<tr><td><b>Testing</b></td><td>Pest</td></tr>
+</table>
+
+## 📂 Struktur Project
+
+<details>
+<summary>Klik untuk lihat struktur folder</summary>
+
+```
+app/
+├─ Http/Controllers/       # Task, Note, Finance, Budget, Document, Analytics, Auth, dll
+├─ Models/                 # Task, TaskProperty, TaskPropertyValue, Note, Block,
+│                          # FinanceRecord, Budget, Category, Document, User
+resources/
+├─ views/                  # Blade views per modul (tasks, notes, finance, budget, documents, analytics, dashboard)
+├─ js/react/                # Board & Table view, Command Menu (React)
+├─ css/                     # Styling claymorphism (app.css, landing.css)
+database/
+└─ migrations/              # Skema tabel tasks, notes, blocks, finance, budget, documents, task_properties, dst
+```
+
+</details>
+
+## 🚀 Instalasi & Menjalankan Lokal
+
+**Requirement:** PHP ^8.1 · Composer · Node.js · MySQL (atau database lain yang didukung Laravel)
+
+```bash
+# 1. Clone repo
+git clone https://github.com/Fahmiemambo/Planova.git
+cd Planova
+
+# 2. Install dependency
+composer install
+npm install
+
+# 3. Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# 4. Setup database (buat database "planova" atau sesuaikan .env)
+php artisan migrate
+
+# 5. Jalankan
+php artisan serve
+npm run dev
+```
+
+Buka **http://localhost:8000** 🎉
+
+<details>
+<summary>⚙️ Opsional: Login with Google</summary>
+
+<br>
+
+Isi kredensial berikut di `.env`:
+
+```env
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+</details>
+
+## 🗺️ Roadmap
+
+- [ ] UI/UX rebuild untuk konsistensi desain di semua halaman
+- [ ] Penyempurnaan sistem Task Properties (grouped status) & Task Types
+- [ ] Rich text toolbar untuk block editor di Notes
+- [ ] Dark mode penuh di seluruh halaman
+
+## 🤝 Kontribusi
+
+Planova masih dikembangkan secara individu untuk keperluan belajar & eksperimen UI/UX. Saran, ide, atau bug report tetap terbuka lewat **Issues**.
+
+## 📄 Lisensi
+
+Belum ditentukan secara resmi — tambahkan file `LICENSE` sebelum dipakai secara publik.
+
+---
+
+<div align="center">
+  <sub>Dibangun dengan Laravel, secangkir kopi, dan terlalu banyak refactor UI 🌿</sub>
+</div>
