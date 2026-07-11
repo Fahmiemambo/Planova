@@ -1,14 +1,6 @@
 <header class="h-16 flex items-center px-4 lg:px-8 gap-3 flex-shrink-0 z-30"
     style="background: rgba(240,253,250,0.90); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1.5px solid rgba(255,255,255,0.7);">
 
-    {{-- Logo --}}
-    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 flex-shrink-0 group">
-        <div class="w-9 h-9 rounded-xl overflow-hidden">
-            <img src="/images/planova-logo.png" alt="Planova" class="w-full h-full object-contain">
-        </div>
-        <span class="font-bold text-primary hidden sm:inline">Planova</span>
-    </a>
-
     {{-- Mobile Sidebar toggle --}}
     <button class="sidebar-toggle-btn lg:hidden btn-planova btn-secondary-p !px-2.5 !py-2 flex-shrink-0" aria-label="Toggle sidebar">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -40,20 +32,19 @@
         <input type="text" placeholder="Cari..." class="bg-transparent border-none outline-none text-sm font-bold placeholder-primary/35 text-primary-dark w-full">
     </div>
 
-    {{-- Quick actions --}}
     <div class="flex items-center gap-2 flex-shrink-0">
-        <a href="{{ route('tasks.create') }}" class="btn-planova btn-primary-p btn-sm-p hidden sm:inline-flex gap-1.5" title="Task Baru">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Task
-        </a>
 
         {{-- User avatar dropdown --}}
         @auth
         <div class="relative group">
-            <button class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-extrabold text-sm shadow-clay-sm hover:scale-105 transition-transform focus:outline-none cursor-pointer select-none"
-                aria-label="User menu">
-                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-            </button>
+            @if(\App\Helpers\AvatarHelper::hasAvatar(auth()->user()))
+                <img src="{{ \App\Helpers\AvatarHelper::getAvatarUrl(auth()->user()) }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 rounded-full object-cover shadow-clay-sm hover:scale-105 transition-transform focus:outline-none cursor-pointer select-none">
+            @else
+                <button class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-extrabold text-sm shadow-clay-sm hover:scale-105 transition-transform focus:outline-none cursor-pointer select-none"
+                    aria-label="User menu">
+                    {{ \App\Helpers\AvatarHelper::getInitials(auth()->user()) }}
+                </button>
+            @endif
             <div class="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur border border-primary/10 rounded-2xl shadow-clay opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden origin-top-right scale-95 group-hover:scale-100">
                 <div class="px-4 py-3.5 bg-primary/5 border-b border-primary/10">
                     <div class="text-sm font-extrabold text-primary-dark truncate">{{ auth()->user()->name }}</div>

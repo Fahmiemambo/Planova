@@ -4,8 +4,8 @@
 
     {{-- Brand --}}
     <div class="flex items-center gap-3 px-5 h-16 border-b border-white/60 flex-shrink-0">
-        <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-clay-sm transition-transform hover:scale-105 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <div class="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
+            <img src="/images/planova-logo.png" alt="Planova" class="w-full h-full object-contain">
         </div>
         <span class="font-extrabold text-lg text-primary-dark tracking-tight">Plano<span class="text-primary">va</span></span>
     </div>
@@ -103,9 +103,13 @@
     <div class="p-3 border-t border-white/60 flex-shrink-0">
         <div class="flex items-center justify-between p-2.5 bg-white/60 rounded-xl hover:bg-white transition-colors cursor-pointer">
             <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 shadow-clay-sm">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
-                </div>
+                @if(\App\Helpers\AvatarHelper::hasAvatar(auth()->user()))
+                    <img src="{{ \App\Helpers\AvatarHelper::getAvatarUrl(auth()->user()) }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 rounded-full object-cover flex-shrink-0 shadow-clay-sm">
+                @else
+                    <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 shadow-clay-sm">
+                        {{ \App\Helpers\AvatarHelper::getInitials(auth()->user()) }}
+                    </div>
+                @endif
                 <div class="min-w-0">
                     <div class="text-sm font-extrabold text-primary-dark truncate">{{ auth()->user()->name ?? 'User' }}</div>
                     <div class="text-xs text-primary/60 truncate font-bold">Personal Workspace</div>

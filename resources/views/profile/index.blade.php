@@ -39,14 +39,64 @@
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
                 @csrf @method('PUT')
                 
-                <div class="flex items-center gap-6 mb-6">
-                    <div class="w-20 h-20 rounded-full bg-primary-light text-primary dark:bg-primary/20 dark:text-primary-light flex items-center justify-center text-3xl font-bold border-4 border-surface-200 dark:border-dark-surface shadow-sm">
-                        {{ strtoupper(substr($user->name, 0, 2)) }}
+                <div class="flex flex-col sm:flex-row sm:items-end gap-6">
+                    <div class="relative">
+                        @if(\App\Helpers\AvatarHelper::hasAvatar($user))
+                            <img src="{{ \App\Helpers\AvatarHelper::getAvatarUrl($user) }}" alt="{{ $user->name }}" class="w-20 h-20 rounded-full object-cover border-4 border-surface-200 dark:border-dark-surface shadow-sm">
+                        @else
+                            <div class="w-20 h-20 rounded-full bg-primary-light text-primary dark:bg-primary/20 dark:text-primary-light flex items-center justify-center text-3xl font-bold border-4 border-surface-200 dark:border-dark-surface shadow-sm">
+                                {{ \App\Helpers\AvatarHelper::getInitials($user) }}
+                            </div>
+                        @endif
                     </div>
-                    <div>
-                        <button type="button" class="btn-planova btn-secondary-p btn-sm-p">Ubah Avatar</button>
+                    <div class="flex gap-2">
+                        <input type="file" id="avatar-input" name="avatar" class="hidden" accept="image/*">
+                        <button type="button" class="btn-planova btn-secondary-p btn-sm-p" onclick="document.getElementById('avatar-input').click();">
+                            <i class="bi bi-upload"></i> Ubah Avatar
+                        </button>
+                        @if(\App\Helpers\AvatarHelper::hasAvatar($user))
+                            <form method="POST" action="{{ route('profile.avatar.delete') }}" class="inline" onsubmit="return confirm('Hapus avatar?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-planova btn-secondary-p btn-sm-p text-red-600 hover:bg-red-50">
+                                    <i class="bi bi-trash"></i> Hapus
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
+
+                {{-- Avatar upload handling --}}
+                <script>
+                    document.getElementById('avatar-input').addEventListener('change', function(e) {
+                        if (this.files && this.files[0]) {
+                            const formData = new FormData();
+                            formData.append('avatar', this.files[0]);
+                            
+                            fetch('{{ route("profile.avatar.upload") }}', {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) throw response;
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Gagal mengupload avatar. Pastikan file berupa gambar (max 2MB).');
+                            });
+                        }
+                    });
+                </script>
 
                 <div>
                     <label for="name" class="form-label-p">Nama Lengkap</label>
