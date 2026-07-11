@@ -99,6 +99,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])
         ->name('profile.password');
 
+    Route::post('/profile/avatar', [ProfileController::class, 'uploadAvatar'])
+        ->name('profile.avatar.upload');
+
+    Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])
+        ->name('profile.avatar.delete');
+
     // Blocks
     Route::prefix('blocks')->name('blocks.')->group(function () {
 
