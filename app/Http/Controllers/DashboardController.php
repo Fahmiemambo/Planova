@@ -33,13 +33,37 @@ class DashboardController extends Controller
         $totalExpense = FinanceRecord::forUser($userId)->expense()->thisMonth()->sum('amount');
         $netBalance   = $totalIncome - $totalExpense;
 
-        // Budgets (current month)
-        $budgets = Budget::where('user_id', $userId)
-            ->where('period', 'monthly')
-            ->where('period_year', $now->year)
-            ->where('period_month', $now->month)
-            ->with('category')
-            ->get();
+        // Economy news (static latest updates)
+        $economyNews = collect([
+            [
+                'title' => 'Bank Indonesia pertahankan suku bunga hingga 6,00%',
+                'summary' => 'BI menegaskan stabilitas makroekonomi tetap terjaga meski tekanan global meningkat.',
+                'source' => 'Detik Finance',
+                'date' => '12 Juli 2026',
+                'url' => 'https://www.detik.com/finance'
+            ],
+            [
+                'title' => 'Inflasi terkendali, daya beli konsumen membaik di kuartal kedua',
+                'summary' => 'Pertumbuhan konsumsi rumah tangga menjadi pendorong utama pemulihan ekonomi nasional.',
+                'source' => 'Kontan',
+                'date' => '11 Juli 2026',
+                'url' => 'https://www.kontan.co.id/'
+            ],
+            [
+                'title' => 'Investasi asing masuk ke sektor energi hijau',
+                'summary' => 'Dana segar mengalir ke proyek transisi energi seiring target net-zero Indonesia.',
+                'source' => 'Bisnis Indonesia',
+                'date' => '10 Juli 2026',
+                'url' => 'https://www.bisnis.com/'
+            ],
+            [
+                'title' => 'Pelonggaran pajak UMKM diharapkan dorong pertumbuhan usaha kecil',
+                'summary' => 'Kebijakan fiskal baru ditargetkan untuk memperkuat daya saing usaha mikro dan kecil.',
+                'source' => 'Investor Daily',
+                'date' => '9 Juli 2026',
+                'url' => 'https://www.investor.id/'
+            ],
+        ]);
 
         // Recent tasks (5 most recent)
         $recentTasks = Task::forUser($userId)
@@ -57,7 +81,7 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact(
             'taskStats', 'totalIncome', 'totalExpense', 'netBalance',
-            'budgets', 'recentTasks', 'recentFinance'
+            'economyNews', 'recentTasks', 'recentFinance'
         ));
     }
 }

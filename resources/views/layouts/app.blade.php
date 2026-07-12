@@ -28,7 +28,7 @@
 
     @stack('head')
 </head>
-<body class="text-text-main antialiased" style="background-color:#F0FDFA; background-image: radial-gradient(circle at 15% 50%, rgba(45,212,191,0.10) 0%, transparent 50%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.07) 0%, transparent 45%); background-attachment: fixed;">
+<body class="@yield('body_class') text-text-main antialiased" style="background-color:#F0FDFA; background-image: radial-gradient(circle at 15% 50%, rgba(45,212,191,0.10) 0%, transparent 50%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.07) 0%, transparent 45%); background-attachment: fixed;">
 
 <div class="flex h-screen overflow-hidden w-full">
 
@@ -91,6 +91,16 @@
                 <button type="button" id="confirm-modal-cancel" class="btn-planova btn-secondary-p w-full sm:w-auto">Batal</button>
                 <button type="button" id="confirm-modal-confirm" class="btn-planova btn-danger-p w-full sm:w-auto">Hapus</button>
             </div>
+        </div>
+    </div>
+
+    <div id="redirect-loader-overlay" class="redirect-overlay fixed inset-0 z-[120] hidden items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-6" style="display: none;">
+        <div class="redirect-overlay-inner max-w-lg w-full text-center rounded-[2rem] border border-white/20 bg-white/90 p-8 shadow-2xl">
+            <div class="mb-6 flex justify-center">
+                <span class="loader"></span>
+            </div>
+            <p class="text-primary-dark font-bold text-xl mb-3">Dalam <span id="redirect-countdown">5</span> detik Anda akan dialihkan ke halaman yang dituju.</p>
+            <p class="text-sm text-text-muted">Silakan tunggu, berita akan segera terbuka.</p>
         </div>
     </div>
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🪴 Planova FOR THE DEVELOPER MD
+# 🪴 Planova FOR THE DEVELOPER MD & Cloner ma REPO
 
 ### Satu workspace buat semua: tugas, catatan, keuangan, dokumen, dan analitik.
 
@@ -112,30 +112,100 @@ database/
 
 ## 🚀 Instalasi & Menjalankan Lokal
 
-**Requirement:** PHP ^8.1 · Composer · Node.js · MySQL (atau database lain yang didukung Laravel)
+**Requirement:** PHP ^8.1 · Composer · Node.js 18+ · MySQL 8 / MariaDB · Git
 
+> Untuk pengguna Windows dengan Laragon, pastikan Apache dan MySQL sudah aktif dari panel Laragon sebelum menjalankan project.
+
+### 1) Clone repo
 ```bash
-# 1. Clone repo
 git clone https://github.com/Fahmiemambo/Planova.git
 cd Planova
+```
 
-# 2. Install dependency
+### 2) Install dependency
+```bash
 composer install
 npm install
+```
 
-# 3. Setup environment
+> Jika `npm install` gagal di PowerShell karena policy atau skrip, gunakan `npm.cmd install`.
+
+### 3) Setup environment
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-# 4. Setup database (buat database "planova" atau sesuaikan .env)
+### 4) Setup database
+Buat database MySQL terlebih dahulu, misalnya:
+
+```bash
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS planova;"
+```
+
+Lalu pastikan file `.env` berisi konfigurasi database yang sesuai, misalnya:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=planova
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5) Buat storage link
+Agar file avatar dan file media lokal bisa diakses dari browser, jalankan:
+
+```bash
+php artisan storage:link
+```
+
+### 6) Jalankan migrasi
+```bash
 php artisan migrate
+```
 
-# 5. Jalankan
+### 7) Build asset frontend
+Ini penting supaya Laravel bisa menemukan manifest Vite dan halaman tidak error 500 saat pertama kali dibuka.
+
+```bash
+npm run build
+```
+
+### 8) Jalankan aplikasi
+Buka dua terminal terpisah:
+
+```bash
+# Terminal 1
 php artisan serve
+```
+
+```bash
+# Terminal 2
 npm run dev
 ```
 
 Buka **http://localhost:8000** 🎉
+
+### 9) Troubleshooting yang sering muncul
+- Jika `npm` gagal di PowerShell Windows, gunakan `npm.cmd install` atau jalankan:
+  ```powershell
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+  ```
+- Jika halaman muncul error 500 dan menyebutkan Vite manifest, jalankan:
+  ```bash
+  npm run build
+  ```
+- Jika avatar atau file upload tidak muncul, jalankan:
+  ```bash
+  php artisan storage:link
+  ```
+- Jika muncul error koneksi database, pastikan MySQL sudah hidup dan kredensial `.env` benar.
+- Jika ingin menjalankan tanpa hot-reload frontend, cukup pakai `npm run build` dan `php artisan serve`.
+
+- Jika muncul error koneksi database, pastikan MySQL sudah hidup dan kredensial `.env` benar.
+- Jika ingin menjalankan tanpa hot-reload frontend, cukup gunakan `npm run build` dan `php artisan serve`.
 
 <details>
 <summary>⚙️ Opsional: Login with Google</summary>

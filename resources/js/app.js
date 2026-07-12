@@ -243,6 +243,64 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
     };
 
+    const redirectOverlay = document.getElementById('redirect-loader-overlay');
+    const redirectCountdownEl = document.getElementById('redirect-countdown');
+    let redirectInterval;
+
+    const isEconomyNewsPage = document.body.classList.contains('page-economy-news');
+
+    if (redirectOverlay) {
+        redirectOverlay.classList.add('hidden');
+        redirectOverlay.style.display = 'none';
+    }
+
+    const showRedirectOverlay = (seconds) => {
+        if (!redirectOverlay || !redirectCountdownEl) return;
+        redirectCountdownEl.textContent = seconds.toString();
+        redirectOverlay.style.display = 'flex';
+        redirectOverlay.classList.remove('hidden');
+        redirectOverlay.style.opacity = '0';
+        redirectOverlay.style.transition = 'opacity 0.3s ease';
+        requestAnimationFrame(() => redirectOverlay.style.opacity = '1');
+    };
+
+    const hideRedirectOverlay = () => {
+        if (!redirectOverlay) return;
+        redirectOverlay.style.opacity = '0';
+        clearInterval(redirectInterval);
+        setTimeout(() => {
+            redirectOverlay.classList.add('hidden');
+            redirectOverlay.style.display = 'none';
+        }, 300);
+    };
+
+    const startRedirectCountdown = (href) => {
+        let secondsLeft = 5;
+        showRedirectOverlay(secondsLeft);
+
+        redirectInterval = setInterval(() => {
+            secondsLeft -= 1;
+            if (secondsLeft >= 0) {
+                redirectCountdownEl.textContent = secondsLeft.toString();
+            }
+            if (secondsLeft <= 0) {
+                clearInterval(redirectInterval);
+                window.location.href = href;
+            }
+        }, 1000);
+    };
+
+    if (isEconomyNewsPage) {
+        document.querySelectorAll('.economy-news-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const href = link.getAttribute('href');
+                if (!href) return;
+                startRedirectCountdown(href);
+            });
+        });
+    }
+
     ajaxForms.forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

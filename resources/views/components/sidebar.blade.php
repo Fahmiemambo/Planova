@@ -66,14 +66,14 @@
                     <span>Finance</span>
                 </a>
 
-                {{-- Budget --}}
-                <a href="{{ route('budget.index') }}"
+                {{-- Economy News --}}
+                <a href="{{ route('economy-news.index') }}"
                     class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all
-                    {{ request()->routeIs('budget.*')
+                    {{ request()->routeIs('economy-news.*')
                         ? 'bg-primary text-white shadow-md shadow-primary/20'
                         : 'text-primary-dark hover:bg-white/80 hover:text-primary' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                    <span>Budget</span>
+                    <i class="bi bi-newspaper text-lg"></i>
+                    <span>Berita Ekonomi</span>
                 </a>
 
             </div>

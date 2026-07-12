@@ -1,5 +1,5 @@
 @props([
-    'type'    => 'success',  {{-- success | danger | warning | info --}}
+    'type'    => 'success',
     'message' => '',
     'icon'    => null,
     'dismiss' => true,

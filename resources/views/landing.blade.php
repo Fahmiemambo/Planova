@@ -90,7 +90,7 @@
                 produktivitas Anda
             </h1>
             <p class="text-xl text-text-secondary font-body font-bold max-w-lg mx-auto lg:mx-0 reveal reveal-delay-2">
-                Planova menggabungkan <strong class="text-primary-dark">task manager</strong>, <strong class="text-primary-dark">keuangan</strong>, <strong class="text-primary-dark">budget</strong>, <strong class="text-primary-dark">dokumen</strong>, dan <strong class="text-primary-dark">analitik</strong> dalam satu workspace yang elegan — tanpa berpindah aplikasi.
+                Planova menggabungkan <strong class="text-primary-dark">task manager</strong>, <strong class="text-primary-dark">keuangan</strong>, <strong class="text-primary-dark">berita ekonomi</strong>, <strong class="text-primary-dark">dokumen</strong>, dan <strong class="text-primary-dark">analitik</strong> dalam satu workspace yang elegan — tanpa berpindah aplikasi.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal reveal-delay-3">
                 <a href="{{ route('register') }}" class="clay-btn-accent text-white px-8 py-4 text-lg font-bold rounded-2xl inline-flex items-center justify-center gap-2">
@@ -103,7 +103,7 @@
             <div class="flex flex-wrap justify-center lg:justify-start gap-5 text-sm font-bold text-text-muted reveal reveal-delay-3">
                 <span class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-primary"></i> Gratis, tanpa kartu kredit</span>
                 <span class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-primary"></i> Setup 30 detik</span>
-                <span class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-primary"></i> Dark / Light mode</span>
+                <span class="flex items-center gap-2"><i class="bi bi-check-circle-fill text-primary"></i> Berita ekonomi real-time</span>
             </div>
         </div>
 
@@ -178,7 +178,7 @@
             @foreach([
                 ['bi-check2-square', 'Tasks', 'text-primary'],
                 ['bi-cash-coin', 'Finance', 'text-green-600'],
-                ['bi-bullseye', 'Budget', 'text-amber-600'],
+                ['bi-newspaper', 'Berita Ekonomi', 'text-cyan-600'],
                 ['bi-folder2-open', 'Documents', 'text-blue-600'],
                 ['bi-graph-up-arrow', 'Analytics', 'text-violet-600'],
                 ['bi-person-gear', 'Profile', 'text-text-muted'],
@@ -377,13 +377,13 @@
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 rounded-full font-bold text-green-700 text-sm">
                     <i class="bi bi-cash-coin"></i> Keuangan & Budget
                 </div>
-                <h2 class="text-4xl lg:text-5xl font-extrabold text-primary-dark">Catat keuangan,<br>atur budget,<br>kontrol pengeluaran</h2>
-                <p class="text-xl text-text-secondary font-body font-bold">Lacak setiap pemasukan dan pengeluaran, kategorikan transaksi, dan set limit budget bulanan dengan progress bar yang terus update secara real-time.</p>
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-primary-dark">Catat keuangan,<br>kontrol pengeluaran,<br>ikuti berita ekonomi</h2>
+                <p class="text-xl text-text-secondary font-body font-bold">Lacak setiap pemasukan dan pengeluaran, dapatkan berita ekonomi terbaru, kategorikan transaksi, dan pantau pengeluaran Anda dalam satu dashboard yang terus update secara real-time.</p>
                 <ul class="space-y-3 text-left inline-block">
                     @foreach([
                         ['bi-check-circle-fill text-primary', 'Catat income & expense dengan kategori'],
                         ['bi-check-circle-fill text-primary', 'Filter berdasarkan tipe, kategori, dan bulan'],
-                        ['bi-check-circle-fill text-primary', 'Budget limit dengan visual progress bar'],
+                        ['bi-check-circle-fill text-primary', 'Laporan pengeluaran visual dengan progress bar'],
                         ['bi-check-circle-fill text-primary', 'Kalkulasi saldo bersih otomatis'],
                     ] as [$icon, $text])
                     <li class="flex items-center gap-3 font-bold text-text-secondary">
@@ -511,10 +511,10 @@
             @foreach([
                 ['bi-check2-square', 'Task Manager Lengkap', 'CRUD task dengan status tracking, due date, overdue alert, dan block editor Notion-like untuk mencatat detail pekerjaan.', 'bg-primary/10 text-primary'],
                 ['bi-cash-coin', 'Pencatatan Keuangan', 'Catat setiap pemasukan dan pengeluaran dengan kategori, filter multi-dimensi, dan kalkulasi saldo otomatis.', 'bg-green-100 text-green-600'],
-                ['bi-bullseye', 'Budget Planner', 'Set limit pengeluaran per kategori setiap bulan dan pantau sisa budget dengan progress bar yang akurat.', 'bg-amber-100 text-amber-700'],
+                ['bi-newspaper', 'Berita Ekonomi', 'Dapatkan headline ekonomi terbaru dan summary ringkas langsung di dashboard Anda.', 'bg-cyan-100 text-cyan-700'],
                 ['bi-folder2-open', 'Document Library', 'Upload dan simpan semua jenis file — PDF, Word, Excel, PPT, gambar, ZIP — dengan preview dan download instan.', 'bg-blue-100 text-blue-600'],
                 ['bi-graph-up-arrow', 'Analytics Dashboard', 'Chart interaktif: tren 6 bulan keuangan, distribusi pengeluaran per kategori, dan completion rate task bulanan.', 'bg-violet-100 text-violet-700'],
-                ['bi-moon-stars', 'Dark & Light Mode', 'Tampilan yang nyaman di segala kondisi pencahayaan dengan toggle dark/light mode yang smooth dan konsisten.', 'bg-slate-100 text-slate-600'],
+                ['bi-check-circle', 'Real-time Updates', 'Refresh otomatis dan informasi terbaru pada berita ekonomi setiap kali Anda membuka halaman.', 'bg-slate-100 text-slate-600'],
             ] as [$icon, $title, $desc, $iconClass])
             <div class="clay-card p-6 reveal {{ $loop->index > 2 ? 'reveal-delay-1' : '' }}">
                 <div class="w-12 h-12 rounded-2xl {{ $iconClass }} flex items-center justify-center mb-4">

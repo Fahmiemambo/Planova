@@ -73,8 +73,9 @@ Route::middleware('auth')->group(function () {
     // Finance
     Route::resource('finance', FinanceController::class);
 
-    // Budget
-    Route::resource('budget', BudgetController::class);
+    // Economy News
+    Route::get('/economy-news', [App\Http\Controllers\EconomyNewsController::class, 'index'])
+        ->name('economy-news.index');
 
     // Documents
     Route::resource('documents', DocumentController::class);

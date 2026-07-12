@@ -224,49 +224,38 @@
 
 </div>
 
-{{-- ── Budget Progress ─────────────────────────────────── --}}
-@if($budgets->isNotEmpty())
+{{-- ── Berita Ekonomi Terkini ─────────────────────────────── --}}
 <div class="pcard animate-stagger-card opacity-0">
     <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                <i class="bi bi-newspaper text-blue-700"></i>
             </div>
-            <h2 class="text-base font-extrabold text-primary-dark">Budget Bulan Ini</h2>
+            <h2 class="text-base font-extrabold text-primary-dark">Berita Ekonomi Terkini</h2>
         </div>
-        <a href="{{ route('budget.index') }}" class="btn-planova btn-ghost-p btn-sm-p text-xs">
-            Kelola
+        <a href="{{ route('economy-news.index') }}" class="btn-planova btn-ghost-p btn-sm-p text-xs">
+            Lihat semua
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        @foreach($budgets as $budget)
-            @php
-                $pct = $budget->limit_amount > 0 ? min(100, round(($budget->spent_amount / $budget->limit_amount) * 100)) : 0;
-                $barColor = $pct >= 90 ? '#EF4444' : ($pct >= 70 ? '#F59E0B' : '#0D9488');
-            @endphp
-            <div class="bg-white/60 rounded-2xl p-4 border border-white/80">
-                <div class="flex justify-between items-center mb-2.5">
-                    <span class="text-sm font-extrabold text-primary-dark">{{ $budget->name }}</span>
-                    <span class="text-xs font-extrabold {{ $pct >= 90 ? 'text-red-500' : 'text-text-muted' }}">{{ $pct }}%</span>
-                </div>
-                <x-progress-bar :value="$budget->spent_amount" :max="$budget->limit_amount" :showText="true" />
-                <div class="mt-2 flex justify-between text-xs font-bold text-text-muted">
-                    <span>Rp {{ number_format($budget->spent_amount, 0, ',', '.') }}</span>
-                    <span>/ {{ $budget->formatted_limit }}</span>
-                </div>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        @foreach($economyNews as $news)
+            <a href="{{ $news['url'] }}" target="_blank" rel="noopener noreferrer" class="bg-white/60 rounded-2xl p-4 border border-white/80 hover:shadow-lg transition-shadow">
+                <div class="text-xs uppercase tracking-[0.2em] font-bold text-primary/70 mb-2">{{ $news['source'] }}</div>
+                <h3 class="text-lg font-semibold text-primary-dark mb-2">{{ $news['title'] }}</h3>
+                <p class="text-sm text-text-muted mb-4">{{ $news['summary'] }}</p>
+                <div class="text-xs font-bold text-text-muted">{{ $news['date'] }}</div>
+            </a>
         @endforeach
     </div>
 </div>
-@endif
 
 {{-- ── Quick Links ──────────────────────────────────────── --}}
 <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
     @foreach([
         [route('analytics.index'), 'bi-graph-up-arrow', 'Analytics', 'bg-violet-100 text-violet-700'],
         [route('documents.index'), 'bi-folder2-open', 'Documents', 'bg-blue-100 text-blue-700'],
-        [route('budget.index'), 'bi-bullseye', 'Budget', 'bg-amber-100 text-amber-700'],
+        [route('economy-news.index'), 'bi-newspaper', 'Berita Ekonomi', 'bg-blue-100 text-blue-700'],
         [route('finance.index'), 'bi-cash-coin', 'Finance', 'bg-green-100 text-green-700'],
     ] as [$url, $icon, $label, $colorClass])
     <a href="{{ $url }}"

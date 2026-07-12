@@ -36,10 +36,7 @@
                 <p class="text-sm text-text-muted dark:text-text-darkMuted">Perbarui nama dan alamat email akun Anda.</p>
             </div>
 
-            <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
-                @csrf @method('PUT')
-                
-                <div class="flex flex-col sm:flex-row sm:items-end gap-6">
+                <div class="flex flex-col sm:flex-row sm:items-end gap-6 mb-6">
                     <div class="relative">
                         @if(\App\Helpers\AvatarHelper::hasAvatar($user))
                             <img src="{{ \App\Helpers\AvatarHelper::getAvatarUrl($user) }}" alt="{{ $user->name }}" class="w-20 h-20 rounded-full object-cover border-4 border-surface-200 dark:border-dark-surface shadow-sm">
@@ -49,11 +46,14 @@
                             </div>
                         @endif
                     </div>
-                    <div class="flex gap-2">
-                        <input type="file" id="avatar-input" name="avatar" class="hidden" accept="image/*">
-                        <button type="button" class="btn-planova btn-secondary-p btn-sm-p" onclick="document.getElementById('avatar-input').click();">
-                            <i class="bi bi-upload"></i> Ubah Avatar
-                        </button>
+                    <div class="flex flex-wrap gap-2">
+                        <form id="avatar-form" class="inline" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" id="avatar-input" name="avatar" class="hidden" accept="image/*">
+                            <button type="button" class="btn-planova btn-secondary-p btn-sm-p" onclick="document.getElementById('avatar-input').click();">
+                                <i class="bi bi-upload"></i> Ubah Avatar
+                            </button>
+                        </form>
                         @if(\App\Helpers\AvatarHelper::hasAvatar($user))
                             <form method="POST" action="{{ route('profile.avatar.delete') }}" class="inline" onsubmit="return confirm('Hapus avatar?');">
                                 @csrf @method('DELETE')
@@ -69,9 +69,15 @@
                 <script>
                     document.getElementById('avatar-input').addEventListener('change', function(e) {
                         if (this.files && this.files[0]) {
-                            const formData = new FormData();
-                            formData.append('avatar', this.files[0]);
-                            
+                            const form = document.getElementById('avatar-form');
+                            const formData = new FormData(form);
+                            const submitButton = form.querySelector('button[type="button"]');
+
+                            if (submitButton) {
+                                submitButton.disabled = true;
+                                submitButton.innerHTML = '<i class="bi bi-arrow-repeat"></i> Mengunggah...';
+                            }
+
                             fetch('{{ route("profile.avatar.upload") }}', {
                                 method: 'POST',
                                 body: formData,
@@ -81,22 +87,34 @@
                                     'Accept': 'application/json'
                                 }
                             })
-                            .then(response => {
-                                if (!response.ok) throw response;
-                                return response.json();
+                            .then(async response => {
+                                const data = await response.json().catch(() => ({}));
+                                if (!response.ok) {
+                                    throw new Error(data.message || 'Gagal mengupload avatar.');
+                                }
+                                return data;
                             })
                             .then(data => {
                                 if (data.success) {
-                                    location.reload();
+                                    window.location.reload();
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('Gagal mengupload avatar. Pastikan file berupa gambar (max 2MB).');
+                                alert(error.message || 'Gagal mengupload avatar. Pastikan file berupa gambar (max 5MB).');
+                            })
+                            .finally(() => {
+                                if (submitButton) {
+                                    submitButton.disabled = false;
+                                    submitButton.innerHTML = '<i class="bi bi-upload"></i> Ubah Avatar';
+                                }
                             });
                         }
                     });
                 </script>
+
+            <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
+                @csrf @method('PUT')
 
                 <div>
                     <label for="name" class="form-label-p">Nama Lengkap</label>
