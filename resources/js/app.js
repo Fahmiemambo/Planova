@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2. Interactive Buttons (Hover & Click effect)
-    document.querySelectorAll('.btn-planova, .p-interactive, .pcard').forEach(el => {
+    document.querySelectorAll('.btn-planova, .p-interactive').forEach(el => {
         // Efek saat ditekan
         el.addEventListener('mousedown', () => {
             anime({

@@ -33,6 +33,7 @@
     </div>
 
     <div class="flex items-center gap-2 flex-shrink-0">
+        <a href="{{ route('support') }}" class="hidden md:inline-block text-sm font-bold text-primary/70 hover:text-primary transition-colors mr-3">Support</a>
 
         {{-- User avatar dropdown --}}
         @auth

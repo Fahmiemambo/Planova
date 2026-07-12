@@ -4,11 +4,12 @@ namespace App\Helpers;
 
 use App\Models\User;
 
+
 class AvatarHelper
 {
-    public static function getAvatarUrl(User $user): string
+    public static function getAvatarUrl(?User $user): string
     {
-        if (!$user->avatar) {
+        if (!$user || !$user->avatar) {
             return '';
         }
 
@@ -21,13 +22,17 @@ class AvatarHelper
         return asset('storage/' . $user->avatar);
     }
 
-    public static function hasAvatar(User $user): bool
+    public static function hasAvatar(?User $user): bool
     {
-        return !empty($user->avatar);
+        return $user && !empty($user->avatar);
     }
 
-    public static function getInitials(User $user): string
+    public static function getInitials(?User $user): string
     {
+        if (!$user || empty($user->name)) {
+            return 'U';
+        }
+
         $names = explode(' ', $user->name);
         $initials = '';
 

@@ -38,6 +38,7 @@
         <a href="#finance" class="text-sm font-bold text-text-muted hover:text-primary transition-colors">Keuangan</a>
         <a href="#analytics" class="text-sm font-bold text-text-muted hover:text-primary transition-colors">Analitik</a>
         <a href="#workflow" class="text-sm font-bold text-text-muted hover:text-primary transition-colors">Workflow</a>
+        <a href="{{ route('support') }}" class="text-sm font-bold text-text-muted hover:text-primary transition-colors">Support</a>
     </div>
 
     {{-- CTA --}}
@@ -62,6 +63,7 @@
         <a href="#finance" class="py-3 font-bold text-text-main bg-white/60 rounded-xl hover:bg-white transition-colors">Keuangan</a>
         <a href="#analytics" class="py-3 font-bold text-text-main bg-white/60 rounded-xl hover:bg-white transition-colors">Analitik</a>
         <a href="#workflow" class="py-3 font-bold text-text-main bg-white/60 rounded-xl hover:bg-white transition-colors">Workflow</a>
+        <a href="{{ route('support') }}" class="py-3 font-bold text-text-main bg-white/60 rounded-xl hover:bg-white transition-colors">Support</a>
         <div class="flex gap-2 mt-2">
             <a href="{{ route('login') }}" class="flex-1 clay-btn py-3 text-center text-sm">Masuk</a>
             <a href="{{ route('register') }}" class="flex-1 clay-btn-accent text-white py-3 text-center text-sm font-bold rounded-2xl">Daftar Gratis</a>
@@ -582,6 +584,7 @@
             <a href="#finance" class="hover:text-primary transition-colors">Keuangan</a>
             <a href="#analytics" class="hover:text-primary transition-colors">Analitik</a>
             <a href="#workflow" class="hover:text-primary transition-colors">Cara Kerja</a>
+            <a href="{{ route('support') }}" class="hover:text-primary transition-colors">Support</a>
             <a href="{{ route('login') }}" class="hover:text-primary transition-colors">Masuk</a>
             <a href="{{ route('register') }}" class="hover:text-primary transition-colors">Daftar</a>
         </div>

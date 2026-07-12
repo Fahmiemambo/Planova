@@ -49,6 +49,11 @@ Route::get('/', function () {
     return view('landing');
 });
 
+// Support page (developer QRIS)
+Route::get('/support', function () {
+    return view('support.index');
+})->name('support');
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes
